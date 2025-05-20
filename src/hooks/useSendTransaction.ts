@@ -2,6 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
 import { SendTransactionPayload } from "../types.payload";
 
+/**
+ * Use the useSendTransaction hook to send a transaction by signing it with the user's private key.
+ * @returns A mutation function to send a transaction.
+ */
 export function useSendTransaction() {
   const client = useTrustlessWorkClient();
   const queryClient = useQueryClient();
@@ -20,6 +24,5 @@ export function useSendTransaction() {
     isError: mutation.isError,
     isSuccess: mutation.isSuccess,
     error: mutation.error,
-    data: mutation.data,
   };
 }
