@@ -1,12 +1,22 @@
 import { Escrow } from "./types.entity";
 
-// Payload base
+/**
+ * Documentation: https://docs.trustlesswork.com/trustless-work/developer-resources/quickstart/integration-demo-project/entities
+ */
+
+/**
+ * Escrow Payload
+ */
 export type EscrowPayload = Escrow;
 
-// Initialize Escrow Payload
+/**
+ * Initialize Escrow Payload
+ */
 export type InitializeEscrowPayload = Omit<EscrowPayload, "contractId"> & {};
 
-// Change Milestone Status Payload
+/**
+ * Change Milestone Status Payload
+ */
 export type ChangeMilestoneStatusPayload = {
   contractId?: string;
   milestoneIndex: string;
@@ -15,8 +25,10 @@ export type ChangeMilestoneStatusPayload = {
   serviceProvider?: string;
 };
 
-// Change Milestone Flag Payload
-export type ChangeMilestoneFlagPayload = Omit<
+/**
+ * Change Milestone Flag Payload
+ */
+export type ChangeMilestoneApprovedFlagPayload = Omit<
   ChangeMilestoneStatusPayload,
   "serviceProvider" | "newStatus"
 > & {
@@ -24,13 +36,17 @@ export type ChangeMilestoneFlagPayload = Omit<
   newFlag: boolean;
 };
 
-// Start Dispute Payload
+/**
+ * Start Dispute Payload
+ */
 export type StartDisputePayload = {
   contractId: string;
   signer: string;
 };
 
-// Resolve Dispute Payload
+/**
+ * Resolve Dispute Payload
+ */
 export type ResolveDisputePayload = {
   contractId: string;
   disputeResolver?: string;
@@ -38,56 +54,54 @@ export type ResolveDisputePayload = {
   receiverFunds: string;
 };
 
-// Fund Escrow Payload
+/**
+ * Fund Escrow Payload
+ */
 export type FundEscrowPayload = {
   amount: string;
   contractId: string;
   signer: string;
 };
 
-// Get Escrow Payload
+/**
+ * Get Escrow Payload
+ */
 export type GetEscrowPayload = {
   contractId: string;
   signer: string;
 };
 
-// Release Funds Escrow Payload
-export type ReleaseFundsEscrowPayload = {
+/**
+ * Release Funds Payload
+ */
+export type ReleaseFundsPayload = {
   contractId: string;
   serviceProvider?: string;
   releaseSigner?: string;
   signer: string;
 };
 
-// Update Escrow Payload
+/**
+ * Update Escrow Payload
+ */
 export type UpdateEscrowPayload = {
   contractId: string;
   escrow: EscrowPayload;
   signer: string;
 };
 
-// Get Balance Params
+/**
+ * Get Balance Params
+ */
 export type GetBalanceParams = {
   signer: string;
   addresses: string[];
 };
 
-// Send Transaction Payload
+/**
+ * Send Transaction Payload
+ */
 export interface SendTransactionPayload {
   signedXdr: string;
   returnEscrowDataIsRequired: boolean;
 }
-
-// Escrow Payload Service
-export type EscrowPayloadService =
-  | Escrow
-  | InitializeEscrowPayload
-  | GetEscrowPayload
-  | ChangeMilestoneStatusPayload
-  | ChangeMilestoneFlagPayload
-  | StartDisputePayload
-  | ResolveDisputePayload
-  | FundEscrowPayload
-  | ReleaseFundsEscrowPayload
-  | UpdateEscrowPayload
-  | GetBalanceParams;

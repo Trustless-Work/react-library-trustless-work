@@ -1,4 +1,6 @@
-// Milestone
+/**
+ * Milestone
+ */
 export type Milestone = {
   description: string;
   status: string;
@@ -6,7 +8,9 @@ export type Milestone = {
   approvedFlag: boolean;
 };
 
-// Roles
+/**
+ * Roles
+ */
 export type Roles = {
   approver: string;
   serviceProvider: string;
@@ -16,14 +20,18 @@ export type Roles = {
   receiver: string;
 };
 
-// Flags
+/**
+ * Flags
+ */
 export type Flags = {
   disputeFlag?: boolean;
   releaseFlag?: boolean;
   resolvedFlag?: boolean;
 };
 
-// Escrow
+/**
+ * Escrow
+ */
 export interface Escrow {
   signer?: string;
   contractId?: string;
@@ -40,7 +48,10 @@ export interface Escrow {
   receiverMemo: number;
 }
 
-interface Trustline {
+/**
+ * Trustline
+ */
+export interface Trustline {
   name?: string;
   address: string;
   decimals: number;
