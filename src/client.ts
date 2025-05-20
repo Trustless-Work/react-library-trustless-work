@@ -15,10 +15,8 @@ import {
 } from "./types.payload";
 import {
   EscrowRequestResponse,
-  GetBalancesResponse,
-  InitializeEscrowResponse,
+  GetEscrowBalancesResponse,
   SendTransactionResponse,
-  UpdateEscrowResponse,
 } from "./types.response";
 import { Escrow } from "./types.entity";
 
@@ -163,9 +161,9 @@ export class TrustlessWorkClient {
    * @param data - The data (GetBalanceParams) to get
    * @returns The response from the API
    */
-  getMultipleBalances(data: GetBalanceParams) {
+  getMultipleEscrowBalances(data: GetBalanceParams) {
     return this.axios
-      .get<GetBalancesResponse[]>("/escrow/get-multiple-balances", {
+      .get<GetEscrowBalancesResponse[]>("/helper/get-multiple-escrow-balance", {
         params: data,
       })
       .then((r) => r.data);

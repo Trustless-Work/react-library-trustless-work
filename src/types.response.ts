@@ -34,7 +34,7 @@ export type UpdateEscrowResponse = InitializeEscrowResponse;
 /**
  * Get Balances Response
  */
-export type GetBalancesResponse = {
+export type GetEscrowBalancesResponse = {
   address: string;
   balance: number;
 };

@@ -12,7 +12,7 @@ export function useGetMultipleEscrowBalances() {
 
   const mutation = useMutation({
     mutationFn: (payload: GetBalanceParams) =>
-      client.getMultipleBalances(payload),
+      client.getMultipleEscrowBalances(payload),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["escrows"] });
     },
