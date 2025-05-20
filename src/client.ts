@@ -50,11 +50,7 @@ export class TrustlessWorkClient {
    */
   sendTransaction(data: SendTransactionPayload) {
     return this.axios
-      .post<
-        | SendTransactionResponse
-        | InitializeEscrowResponse
-        | UpdateEscrowResponse
-      >("/helper/send-transaction", data)
+      .post<SendTransactionResponse>("/helper/send-transaction", data)
       .then((r) => r.data);
   }
 
