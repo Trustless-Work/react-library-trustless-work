@@ -1,0 +1,47 @@
+{
+  "name": "@trustless-work/hooks",
+  "version": "0.0.1",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "build:once": "tsup src/index.ts --format esm,cjs --dts",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-orga/hooks.git"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "trustless",
+    "escrow",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.20",
+    "@types/react": "^19.1.4",
+    "eslint": "^9.27.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.3",
+    "ts-jest": "^29.3.4",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.76.1",
+    "axios": "^1.9.0"
+  }
+}
