@@ -6,10 +6,6 @@ An open-source library that makes integrating Trustless Work simple and seamless
 
 ---
 
-![image](https://github.com/user-attachments/assets/fddb264f-512e-4402-ae05-7b7717fc29b1)
-
----
-
 # Maintainers | [Telegram](https://t.me/+kmr8tGegxLU0NTA5)
 
 <table align="center">
