@@ -1,16 +1,14 @@
-import React, { ReactNode, useContext } from "react";
-import { createContext } from "react";
+"use client";
+
+import React, { ReactNode, useContext, useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { baseURL } from "./types";
 import { TrustlessWorkClient } from "./client";
 
-interface TrustlessWorkContextValue {
-  client: TrustlessWorkClient;
-}
-
-const TrustlessWorkContext = createContext<
-  TrustlessWorkContextValue | undefined
->(undefined);
+// Create context outside of the component
+const TrustlessWorkContext = React.createContext<{
+  client: TrustlessWorkClient | null;
+}>({ client: null });
 
 export interface TrustlessWorkProviderProps {
   /**
@@ -43,16 +41,16 @@ export const TrustlessWorkProvider = ({
   apiKey,
   children,
 }: TrustlessWorkProviderProps) => {
-  // Initialize the client
-  const client = new TrustlessWorkClient(baseURL, apiKey);
+  const [client, setClient] = useState<TrustlessWorkClient | null>(null);
+  const [queryClient] = useState(() => new QueryClient());
 
-  // Initialize the query client
-  const queryClient = new QueryClient();
+  useEffect(() => {
+    const newClient = new TrustlessWorkClient(baseURL, apiKey);
+    setClient(newClient);
+  }, [baseURL, apiKey]);
 
   return (
-    // Provide the client to the context
     <TrustlessWorkContext.Provider value={{ client }}>
-      {/* Provide the query client to the children */}
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </TrustlessWorkContext.Provider>
   );
@@ -61,10 +59,11 @@ export const TrustlessWorkProvider = ({
 export function useTrustlessWorkClient() {
   const ctx = useContext(TrustlessWorkContext);
 
-  if (!ctx)
+  if (!ctx.client) {
     throw new Error(
       "useTrustlessWorkClient must be inside TrustlessWorkProvider"
     );
+  }
 
   return ctx.client;
 }
