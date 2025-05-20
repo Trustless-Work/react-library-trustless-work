@@ -23,6 +23,5 @@ export function useSendTransaction() {
     isPending: mutation.isPending,
     isError: mutation.isError,
     isSuccess: mutation.isSuccess,
-    error: mutation.error,
   };
 }

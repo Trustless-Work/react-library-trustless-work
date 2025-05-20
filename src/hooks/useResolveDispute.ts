@@ -23,7 +23,6 @@ export function useResolveDispute() {
     isPending: mutation.isPending,
     isError: mutation.isError,
     isSuccess: mutation.isSuccess,
-    error: mutation.error,
     unsignedTransaction: mutation.data?.unsignedTransaction,
   };
 }

@@ -22,7 +22,6 @@ export function useGetEscrow() {
     isPending: mutation.isPending,
     isError: mutation.isError,
     isSuccess: mutation.isSuccess,
-    error: mutation.error,
     escrow: mutation.data,
   };
 }

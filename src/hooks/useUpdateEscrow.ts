@@ -22,7 +22,6 @@ export function useUpdateEscrow() {
     isPending: mutation.isPending,
     isError: mutation.isError,
     isSuccess: mutation.isSuccess,
-    error: mutation.error,
     unsignedTransaction: mutation.data?.unsignedTransaction,
   };
 }

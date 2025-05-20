@@ -23,7 +23,6 @@ export function useGetMultipleEscrowBalances() {
     isPending: mutation.isPending,
     isError: mutation.isError,
     isSuccess: mutation.isSuccess,
-    error: mutation.error,
     balances: mutation.data,
   };
 }
