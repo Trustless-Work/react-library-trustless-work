@@ -1,6 +1,6 @@
 {
   "name": "@trustless-work/escrow",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -14,13 +14,13 @@
       "types": "./dist/index.d.ts"
     },
     "./types": {
-      "import": "./dist/types/index.esm.js",
-      "require": "./dist/types/index.cjs.js",
+      "import": "./dist/types/index.mjs",
+      "require": "./dist/types/index.cjs",
       "types": "./dist/types/index.d.ts"
     },
     "./hooks": {
-      "import": "./dist/hooks/index.esm.js",
-      "require": "./dist/hooks/index.cjs.js",
+      "import": "./dist/hooks/index.mjs",
+      "require": "./dist/hooks/index.cjs",
       "types": "./dist/hooks/index.d.ts"
     }
   },
