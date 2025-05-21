@@ -11,6 +11,6 @@ export type baseURL =
 export type HttpMethod = "get" | "post" | "put" | "delete";
 
 /**
- * Status
+ * Unique possible statuses for a Trustless Work request
  */
 export type Status = "SUCCESS" | "FAILED";
