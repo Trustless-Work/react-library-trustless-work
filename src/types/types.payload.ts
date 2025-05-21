@@ -12,7 +12,10 @@ export type EscrowPayload = Escrow;
 /**
  * Initialize Escrow Payload
  */
-export type InitializeEscrowPayload = Omit<EscrowPayload, "contractId"> & {};
+export type InitializeEscrowPayload = Omit<
+  EscrowPayload,
+  "contractId" | "balance"
+> & {};
 
 /**
  * Change Milestone Status Payload
