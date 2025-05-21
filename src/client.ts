@@ -12,13 +12,13 @@ import {
   SendTransactionPayload,
   StartDisputePayload,
   UpdateEscrowPayload,
-} from "./types.payload";
+} from "./types";
 import {
   EscrowRequestResponse,
   GetEscrowBalancesResponse,
   SendTransactionResponse,
-} from "./types.response";
-import { Escrow } from "./types.entity";
+} from "./types";
+import { Escrow } from "./types";
 
 export class TrustlessWorkClient {
   private axios: AxiosInstance;
