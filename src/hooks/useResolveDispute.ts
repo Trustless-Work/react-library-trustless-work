@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { ResolveDisputePayload } from "../types.payload";
+import { ResolveDisputePayload } from "../types";
 
 /**
  * Use the useResolveDispute hook to resolve a dispute.

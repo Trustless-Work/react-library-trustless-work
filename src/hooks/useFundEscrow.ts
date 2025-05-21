@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { FundEscrowPayload } from "../types.payload";
+import { FundEscrowPayload } from "../types";
 
 /**
  * Use the useFundEscrow hook to fund an escrow.

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { ChangeMilestoneStatusPayload } from "../types.payload";
+import { ChangeMilestoneStatusPayload } from "../types";
 
 /**
  * Use the useChangeMilestoneStatus hook to change the status of a milestone.

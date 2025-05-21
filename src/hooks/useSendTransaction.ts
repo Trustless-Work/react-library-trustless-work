@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { SendTransactionPayload } from "../types.payload";
+import { SendTransactionPayload } from "../types";
 
 /**
  * Use the useSendTransaction hook to send a transaction by signing it with the user's private key.

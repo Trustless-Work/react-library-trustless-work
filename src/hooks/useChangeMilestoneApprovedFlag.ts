@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { ChangeMilestoneApprovedFlagPayload } from "../types.payload";
+import { ChangeMilestoneApprovedFlagPayload } from "../types";
 
 /**
  * Use the useChangeMilestoneApprovedFlag hook to change the approved flag of a milestone.

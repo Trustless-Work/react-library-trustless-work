@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { UpdateEscrowPayload } from "../types.payload";
+import { UpdateEscrowPayload } from "../types";
 
 /**
  * Use the useUpdateEscrow hook to update an escrow.

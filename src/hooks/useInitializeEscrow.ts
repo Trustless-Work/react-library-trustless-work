@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { InitializeEscrowPayload } from "../types.payload";
+import { InitializeEscrowPayload } from "../types";
 
 /**
  * Use the useInitializeEscrow hook to initialize an escrow.
