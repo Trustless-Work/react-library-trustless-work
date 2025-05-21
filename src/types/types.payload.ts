@@ -147,11 +147,6 @@ export type ReleaseFundsPayload = {
   contractId: string;
 
   /**
-   * Address of the entity providing the service.
-   */
-  serviceProvider: string;
-
-  /**
    * Address of the user in charge of releasing the escrow funds to the service provider.
    */
   releaseSigner: string;
@@ -174,7 +169,7 @@ export type UpdateEscrowPayload = {
   /**
    * Escrow data
    */
-  escrow: EscrowPayload;
+  escrow: Omit<EscrowPayload, "contractId" | "signer" | "balance">;
 
   /**
    * Address of the user signing the contract transaction

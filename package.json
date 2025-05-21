@@ -1,6 +1,6 @@
 {
-  "name": "trustless-work",
-  "version": "0.2.5",
+  "name": "@trustless-work/escrow",
+  "version": "0.1.2",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -8,6 +8,11 @@
     "dist"
   ],
   "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
     "./types": {
       "import": "./dist/types/index.esm.js",
       "require": "./dist/types/index.cjs.js",
