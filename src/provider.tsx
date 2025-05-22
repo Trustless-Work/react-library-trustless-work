@@ -10,7 +10,7 @@ const TrustlessWorkContext = React.createContext<{
   client: TrustlessWorkClient | null;
 }>({ client: null });
 
-export interface TrustlessWorkProviderProps {
+export interface TrustlessWorkConfigProps {
   /**
    * The base URL for the Trustless Work API. Must be one of:
    * - "https://api.trustlesswork.com" (production)
@@ -36,11 +36,11 @@ export interface TrustlessWorkProviderProps {
  * @param props - The props for the provider
  * @returns The provider for the Trustless Work API
  */
-export const TrustlessWorkProvider = ({
+export const TrustlessWorkConfig = ({
   baseURL,
   apiKey,
   children,
-}: TrustlessWorkProviderProps) => {
+}: TrustlessWorkConfigProps) => {
   const [client, setClient] = useState<TrustlessWorkClient | null>(null);
   const [queryClient] = useState(() => new QueryClient());
 
@@ -61,7 +61,7 @@ export function useTrustlessWorkClient() {
 
   if (!ctx.client) {
     throw new Error(
-      "useTrustlessWorkClient must be inside TrustlessWorkProvider"
+      "useTrustlessWorkClient must be inside TrustlessWorkConfig"
     );
   }
 
