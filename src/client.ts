@@ -5,7 +5,7 @@ import {
   ChangeMilestoneStatusPayload,
   FundEscrowPayload,
   GetBalanceParams,
-  GetEscrowPayload,
+  GetEscrowParams,
   InitializeEscrowPayload,
   ReleaseFundsPayload,
   ResolveDisputePayload,
@@ -145,10 +145,10 @@ export class TrustlessWorkClient {
 
   /**
    * Get an escrow
-   * @param data - The data (GetEscrowPayload) to get
+   * @param data - The data (GetEscrowParams) to get
    * @returns The response from the API
    */
-  getEscrow(data: GetEscrowPayload) {
+  getEscrow(data: GetEscrowParams) {
     return this.axios
       .get<Escrow>("/escrow/get-escrow-by-contract-id", {
         params: data,
