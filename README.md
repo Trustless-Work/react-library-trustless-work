@@ -1,6 +1,6 @@
 <p align="center"> <img src="https://github.com/user-attachments/assets/5b182044-dceb-41f5-acf0-da22dea7c98a" alt="CLR-S (2)"> </p>
 
-# Trustless Work React Hooks Library
+# Trustless Work React Library
 
 A powerful React library for integrating Trustless Work's escrow and dispute resolution system into your applications. This library provides a set of React hooks and utilities to interact with the Trustless Work API.
 
