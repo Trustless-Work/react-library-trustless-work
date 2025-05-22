@@ -14,27 +14,56 @@ yarn add @trustless-work/escrow
 
 ## Quick Start
 
-1. First, wrap your application with the `TrustlessWorkProvider`:
-   Make sure that is a client component.
+1. Trustless Work React provides the TrustlessWorkConfig to provides all the custom hooks and entities to the whole project. To achieve this you'll need to create a Provider.
 
 ```tsx
-"use client" // make sure that is client component
+"use client"; // make sure this is a client component
 
-import { TrustlessWorkProvider } from '@trustlesswork/hooks';
+import React from "react";
+import {
+  // development environment = "https://dev.api.trustlesswork.com"
+  development,
 
-function App() {
+  // mainnet environment = "https://api.trustlesswork.com"
+  mainNet,
+  TrustlessWorkConfig,
+} from "@trustless-work/escrow";
+
+interface TrustlessWorkProviderProps {
+  children: React.ReactNode;
+}
+
+export function TrustlessWorkProvider({
+  children,
+}: TrustlessWorkProviderProps) {
+  /**
+   * Get the API key from the environment variables
+   */
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY || "";
+
   return (
-    <TrustlessWorkProvider
-      baseURL="https://api.trustlesswork.com" // or "https://dev.api.trustlesswork.com" for development
-      apiKey="your-api-key"
-    >
+    <TrustlessWorkConfig baseURL={development} apiKey={apiKey}>
+      {children}
+    </TrustlessWorkConfig>
+  );
+}
+```
+
+2. Wrap your app in the provider
+
+```tsx
+import { TrustlessWorkProvider} from "@/trustless-work-provider.tsx";
+ 
+export function App() {
+  return (
+    <TrustlessWorkProvider>
       <YourApp />
     </TrustlessWorkProvider>
   );
 }
 ```
 
-2. Use the hooks in your components:
+3. Use the hooks in your components:
 
 ```tsx
 import { useInitializeEscrow, useGetEscrow } from '@trustless-work/escrow/hooks';
@@ -103,30 +132,41 @@ Make sure to:
 ## Example Usage
 
 ```tsx
-import { useInitializeEscrow, useSendTransaction } from "@trustless-work/escrow/hooks";
-import { InitializeEscrowPayload } from "@trustless-work/escrow/types";
+import {
+  useInitializeEscrow,
+  useSendTransaction,
+} from "@trustless-work/escrow/hooks";
+import {
+  InitializeEscrowPayload
+} from "@trustless-work/escrow/types";
 
-const { deployEscrow } = useInitializeEscrowHook();
-const { sendTransaction } = useSendTransaction();
+export const useInitializeEscrowForm = () => {
 
+ /*
+  *  useInitializeEscrow
+ */
+ const { deployEscrow, isPending, isError, isSuccess } = useInitializeEscrow();
+ 
+ /*
+  *  useSendTransaction
+ */
+ const { sendTransaction, isPending, isError, isSuccess } = useSendTransaction();
 
+/*
+ * onSubmit function, this could be called by form button
+*/
  const onSubmit = async (payload: InitializeEscrowPayload) => {
 
     try {
-      // This is the final payload that will be sent to the API
-      const finalPayload: InitializeEscrowPayload = {
-        ...payload,
-        receiverMemo: payload.receiverMemo ?? 0,
-        signer: walletAddress || "",
-      };
-
       /**
        * API call by using the trustless work hooks
        * @Note:
        * - We need to pass the payload to the deployEscrow function
        * - The result will be an unsigned transaction
        */
-      const { unsignedTransaction } = await deployEscrow(finalPayload);
+      const { unsignedTransaction } = await deployEscrow(
+        payload
+      );
 
       if (!unsignedTransaction) {
         throw new Error(
@@ -136,10 +176,10 @@ const { sendTransaction } = useSendTransaction();
 
       /**
        * @Note:
-       * - We need to sign the transaction using your private key
+       * - We need to sign the transaction using your [private key] such as wallet
        * - The result will be a signed transaction
        */
-      const signedXdr = await signTransaction({
+      const signedXdr = await signTransaction({ /* This method should be provided by the wallet */
         unsignedTransaction,
         address: walletAddress || "",
       });
@@ -155,37 +195,27 @@ const { sendTransaction } = useSendTransaction();
        */
       const data = await sendTransaction({
         signedXdr,
-        returnEscrowDataIsRequired: true,
+        returnEscrowDataIsRequired: true, // make sure that in initialize this property is true
       });
 
       /**
        * @Responses:
        * data.status === "SUCCESS"
-       * - Escrow created successfully
-       * - Set the escrow in the context
-       * - Set the active tab to "escrow"
+       * - Escrow updated successfully
        * - Show a success toast
        *
-       * data.status !== "SUCCESS"
+       * data.status == "ERROR"
        * - Show an error toast
        */
-      if (data && data.status === "SUCCESS") {
-        const escrow = buildEscrowFromResponse(
-          data as InitializeEscrowResponse,
-          walletAddress || ""
-        );
-        setEscrow(escrow);
+      if (data.status === "SUCCESS") {
         toast.success("Escrow Created");
       }
     } catch (error: unknown) {
-      const mappedError = handleError(error as AxiosError | WalletError);
-      console.error("Error:", mappedError.message);
-
-      toast.error(
-        mappedError ? mappedError.message : "An unknown error occurred"
-      );
+      // catch error logic
     }
   };
+}
+
 ```
 
 ## Contributing

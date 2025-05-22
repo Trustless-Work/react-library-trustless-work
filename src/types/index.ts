@@ -32,7 +32,7 @@ export type { ChangeMilestoneApprovedFlagPayload } from "./types.payload";
 export type { StartDisputePayload } from "./types.payload";
 export type { ResolveDisputePayload } from "./types.payload";
 export type { FundEscrowPayload } from "./types.payload";
-export type { GetEscrowPayload } from "./types.payload";
+export type { GetEscrowParams } from "./types.payload";
 export type { ReleaseFundsPayload } from "./types.payload";
 export type { UpdateEscrowPayload } from "./types.payload";
 export type { GetBalanceParams } from "./types.payload";

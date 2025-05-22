@@ -126,9 +126,9 @@ export type FundEscrowPayload = {
 };
 
 /**
- * Get Escrow Payload
+ * Get Escrow Params
  */
-export type GetEscrowPayload = {
+export type GetEscrowParams = {
   /**
    * ID (address) that identifies the escrow contract
    */
