@@ -1,24 +1,86 @@
-import { Escrow } from "./types.entity";
+import { Escrow, MultiReleaseMilestone } from "./types.entity";
 
 /**
  * Documentation: https://docs.trustlesswork.com/trustless-work/developer-resources/quickstart/integration-demo-project/entities
  */
 
+// ----------------- Initialize Escrow -----------------
 /**
- * Escrow Payload
+ * Base Initialize Escrow Payload
  */
-export type EscrowPayload = Escrow;
+type BaseInitializeEscrowPayload = Omit<Escrow, "contractId" | "balance">;
 
 /**
- * Initialize Escrow Payload
+ * Single Release Initialize Escrow Payload
  */
-export type InitializeEscrowPayload = Omit<
-  EscrowPayload,
-  "contractId" | "balance"
-> & {};
+export type SingleReleaseInitializeEscrowPayload = BaseInitializeEscrowPayload;
 
 /**
- * Change Milestone Status Payload
+ * Multi Release Initialize Escrow Payload
+ */
+export type MultiReleaseInitializeEscrowPayload = Omit<
+  BaseInitializeEscrowPayload,
+  "amount" | "flags"
+> & {
+  /**
+   * Objectives to be completed to define the escrow as completed
+   */
+  milestones: MultiReleaseMilestone[];
+};
+
+/**
+ * Initialize Escrow Payload, this can be a single-release or multi-release
+ */
+export type InitializeEscrowPayload =
+  | SingleReleaseInitializeEscrowPayload
+  | MultiReleaseInitializeEscrowPayload;
+
+// ----------------- Update Escrow -----------------
+/**
+ * Base Update Escrow Payload
+ */
+type BaseUpdateEscrowPayload = {
+  /**
+   * ID (address) that identifies the escrow contract
+   */
+  contractId: string;
+
+  /**
+   * Escrow data
+   */
+  escrow: Omit<Escrow, "contractId" | "signer" | "balance">;
+
+  /**
+   * Address of the user signing the contract transaction
+   */
+  signer: string;
+};
+
+/**
+ * Single Release Update Escrow Payload
+ */
+export type SingleReleaseUpdateEscrowPayload = BaseUpdateEscrowPayload;
+
+/**
+ * Multi Release Update Escrow Payload
+ */
+export type MultiReleaseUpdateEscrowPayload = BaseUpdateEscrowPayload & {
+  /**
+   * Index of the milestone to be updated
+   */
+  milestoneIndex: string;
+};
+
+/**
+ * Update Escrow Payload, this can be a single-release or multi-release
+ */
+export type UpdateEscrowPayload =
+  | SingleReleaseUpdateEscrowPayload
+  | MultiReleaseUpdateEscrowPayload;
+
+// ----------------- Change Milestone Status -----------------
+/**
+ * Change Milestone Status Payload, this can be a single-release or multi-release
  */
 export type ChangeMilestoneStatusPayload = {
   /**
@@ -47,10 +109,11 @@ export type ChangeMilestoneStatusPayload = {
   serviceProvider: string;
 };
 
+// ----------------- Approve Milestone -----------------
 /**
- * Change Milestone Flag Payload
+ * Approve Milestone Payload, this can be a single-release or multi-release
  */
-export type ChangeMilestoneApprovedFlagPayload = Omit<
+export type ApproveMilestonePayload = Omit<
   ChangeMilestoneStatusPayload,
   "serviceProvider" | "newStatus"
 > & {
@@ -65,10 +128,11 @@ export type ChangeMilestoneApprovedFlagPayload = Omit<
   newFlag: boolean;
 };
 
+// ----------------- Start Dispute -----------------
 /**
- * Start Dispute Payload
+ * Base Start Dispute Payload
  */
-export type StartDisputePayload = {
+type BaseStartDisputePayload = {
   /**
    * ID (address) that identifies the escrow contract
    */
@@ -81,9 +145,32 @@ export type StartDisputePayload = {
 };
 
 /**
- * Resolve Dispute Payload
+ * Single Release Start Dispute Payload. This starts a dispute for the entire escrow.
  */
-export type ResolveDisputePayload = {
+export type SingleReleaseStartDisputePayload = BaseStartDisputePayload;
+
+/**
+ * Multi Release Start Dispute Payload. This starts a dispute for a specific milestone.
+ */
+export type MultiReleaseStartDisputePayload = BaseStartDisputePayload & {
+  /**
+   * Index of the milestone to be disputed
+   */
+  milestoneIndex: string;
+};
+
+/**
+ * Start Dispute Payload, this can be a single-release or multi-release
+ */
+export type StartDisputePayload =
+  | SingleReleaseStartDisputePayload
+  | MultiReleaseStartDisputePayload;
+
+// ----------------- Resolve Dispute -----------------
+/**
+ * Base Resolve Dispute Payload
+ */
+type BaseResolveDisputePayload = {
   /**
    * ID (address) that identifies the escrow contract
    */
@@ -106,7 +193,30 @@ export type ResolveDisputePayload = {
 };
 
 /**
- * Fund Escrow Payload
+ * Resolve Dispute Payload
+ */
+export type SingleReleaseResolveDisputePayload = BaseResolveDisputePayload;
+
+/**
+ * Multi Release Resolve Dispute Payload
+ */
+export type MultiReleaseResolveDisputePayload = BaseResolveDisputePayload & {
+  /**
+   * Index of the milestone to be resolved
+   */
+  milestoneIndex: string;
+};
+
+/**
+ * Resolve Dispute Payload, this can be a single-release or multi-release
+ */
+export type ResolveDisputePayload =
+  | SingleReleaseResolveDisputePayload
+  | MultiReleaseResolveDisputePayload;
+
+// ----------------- Fund Escrow -----------------
+/**
+ * Fund Escrow Payload, this can be a single-release or multi-release
  */
 export type FundEscrowPayload = {
   /**
@@ -125,6 +235,7 @@ export type FundEscrowPayload = {
   signer: string;
 };
 
+// ----------------- Get Escrow -----------------
 /**
  * Get Escrow Params
  */
@@ -140,10 +251,11 @@ export type GetEscrowParams = {
   signer: string;
 };
 
+// ----------------- Release Funds -----------------
 /**
- * Release Funds Payload
+ * Base Release Funds Payload
  */
-export type ReleaseFundsPayload = {
+type BaseReleaseFundsPayload = {
   /**
    * ID (address) that identifies the escrow contract
    */
@@ -161,25 +273,28 @@ export type ReleaseFundsPayload = {
 };
 
 /**
- * Update Escrow Payload
+ * Single Release Release Funds Payload
  */
-export type UpdateEscrowPayload = {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
-  contractId: string;
+export type SingleReleaseReleaseFundsPayload = BaseReleaseFundsPayload;
 
+/**
+ * Multi Release Release Funds Payload
+ */
+export type MultiReleaseReleaseFundsPayload = BaseReleaseFundsPayload & {
   /**
-   * Escrow data
+   * Index of the milestone to be released
    */
-  escrow: Omit<EscrowPayload, "contractId" | "signer" | "balance">;
-
-  /**
-   * Address of the user signing the contract transaction
-   */
-  signer: string;
+  milestoneIndex: string;
 };
 
+/**
+ * Release Funds Payload, this can be a single-release or multi-release
+ */
+export type ReleaseFundsPayload =
+  | SingleReleaseReleaseFundsPayload
+  | MultiReleaseReleaseFundsPayload;
+
+// ----------------- Get Balance -----------------
 /**
  * Get Balance Params
  */
@@ -195,6 +310,7 @@ export type GetBalanceParams = {
   addresses: string[];
 };
 
+// ----------------- Send Transaction -----------------
 /**
  * Send Transaction Payload
  */

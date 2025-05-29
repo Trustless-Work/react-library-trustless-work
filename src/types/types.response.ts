@@ -1,5 +1,5 @@
 import { Status } from "./types";
-import { EscrowPayload } from "./types.payload";
+import { Escrow } from "./types.entity";
 
 /**
  * Escrow's Response like fund, release, change, etc ...
@@ -43,7 +43,7 @@ export type InitializeEscrowResponse = EscrowRequestResponse & {
   /**
    * Escrow data
    */
-  escrow: EscrowPayload;
+  escrow: Escrow;
 
   /**
    * Message of the request
