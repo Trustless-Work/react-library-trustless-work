@@ -1,6 +1,6 @@
 {
   "name": "@trustless-work/escrow",
-  "version": "0.1.8",
+  "version": "0.2.4",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -32,7 +32,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Trustless-Work/trustless-work-hooks.git"
+    "url": "https://github.com/Trustless-Work/react-library-trustless-work.git"
   },
   "keywords": [
     "react",
