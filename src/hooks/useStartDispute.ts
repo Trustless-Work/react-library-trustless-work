@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { StartDisputePayload } from "../types";
+import { EscrowType, StartDisputePayload } from "../types";
 
 /**
  * Use the useStartDispute hook to start a dispute.
@@ -11,7 +11,13 @@ export function useStartDispute() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (payload: StartDisputePayload) => client.startDispute(payload),
+    mutationFn: ({
+      payload,
+      type,
+    }: {
+      payload: StartDisputePayload;
+      type: EscrowType;
+    }) => client.startDispute(payload, type),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["escrows"] });
     },
