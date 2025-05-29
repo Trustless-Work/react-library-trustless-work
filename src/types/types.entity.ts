@@ -1,7 +1,7 @@
 /**
  * Milestone
  */
-type Milestone = {
+export type Milestone = {
   /**
    * Text describing the function of the milestone.
    */
@@ -16,13 +16,22 @@ type Milestone = {
    * Evidence of work performed by the service provider.
    */
   evidence: string;
+
+  /**
+   * Flags validating certain milestone life states
+   */
+  flags?: Flags;
 };
 
 /**
  * Single Release Milestone
  */
-export type SingleReleaseMilestone = Milestone;
-
+export type SingleReleaseMilestone = Milestone & {
+  /**
+   * Approved flag
+   */
+  flags?: Omit<Flags, "released" | "resolved" | "disputed">;
+};
 /**
  * Multi Release Milestone
  */
@@ -31,11 +40,6 @@ export type MultiReleaseMilestone = Milestone & {
    * Amount to be transferred upon completion of this milestone
    */
   amount: string;
-
-  /**
-   * Flags validating certain milestone life states
-   */
-  flags?: Flags;
 };
 
 /**

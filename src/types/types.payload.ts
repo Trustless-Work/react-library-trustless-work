@@ -309,19 +309,3 @@ export type GetBalanceParams = {
    */
   addresses: string[];
 };
-
-// ----------------- Send Transaction -----------------
-/**
- * Send Transaction Payload
- */
-export interface SendTransactionPayload {
-  /**
-   * Signed XDR transaction
-   */
-  signedXdr: string;
-
-  /**
-   * Flag indicating if the escrow data is required to be returned. Only InitializeEscrow and UpdateEscrow are allowed to return the escrow data.
-   */
-  returnEscrowDataIsRequired: boolean;
-}

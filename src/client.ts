@@ -12,7 +12,6 @@ import {
   InitializeEscrowPayload,
   ReleaseFundsPayload,
   ResolveDisputePayload,
-  SendTransactionPayload,
   StartDisputePayload,
   UpdateEscrowPayload,
 } from "./types";
@@ -48,16 +47,16 @@ export class TrustlessWorkClient {
 
   /**
    * Send a transaction
-   * @param data - The data (SendTransactionPayload) to send
+   * @param signedXdr - The signed XDR transaction string
    * @returns The response from the API SendTransactionResponse | InitializeEscrowResponse | UpdateEscrowResponse
    */
-  sendTransaction(data: SendTransactionPayload) {
+  sendTransaction(signedXdr: string) {
     return this.axios
       .post<
         | SendTransactionResponse
         | InitializeEscrowResponse
         | UpdateEscrowResponse
-      >("/helper/send-transaction", data)
+      >("/helper/send-transaction", { signedXdr })
       .then((r) => r.data);
   }
 
@@ -171,11 +170,12 @@ export class TrustlessWorkClient {
   /**
    * Get an escrow
    * @param data - The data (GetEscrowParams) to get
+   * @param type - The type of escrow (single-release or multi-release) to get
    * @returns The response from the API Escrow
    */
-  getEscrow(data: GetEscrowParams) {
+  getEscrow(data: GetEscrowParams, type: EscrowType) {
     return this.axios
-      .get<Escrow>("/escrow/get-escrow", {
+      .get<Escrow>(`/escrow/${type}/get-escrow`, {
         params: data,
       })
       .then((r) => r.data);
