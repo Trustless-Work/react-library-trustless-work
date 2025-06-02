@@ -3,8 +3,7 @@
  */
 export type baseURL =
   | "https://api.trustlesswork.com"
-  | "https://dev.api.trustlesswork.com"
-  | "http://localhost:3000";
+  | "https://dev.api.trustlesswork.com";
 
 /**
  * Escrow Type
