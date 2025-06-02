@@ -99,9 +99,9 @@ export type ChangeMilestoneStatusPayload = {
   newStatus: string;
 
   /**
-   * Evidence of work performed by the service provider.
+   * New evidence of work performed by the service provider.
    */
-  evidence?: string;
+  newEvidence?: string;
 
   /**
    * Address of the entity providing the service.
