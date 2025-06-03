@@ -1,36 +1,62 @@
-import { Escrow, MultiReleaseMilestone } from "./types.entity";
+import { Escrow, MultiReleaseEscrow } from "./types.entity";
 
 /**
  * Documentation: https://docs.trustlesswork.com/trustless-work/developer-resources/quickstart/integration-demo-project/entities
  */
 
-// ----------------- Initialize Escrow -----------------
+// ----------------- Milestone Payloads -----------------
 /**
- * Base Initialize Escrow Payload
+ * Single Release Milestone Payload
  */
-type BaseInitializeEscrowPayload = Omit<Escrow, "contractId" | "balance">;
+type SingleReleaseMilestonePayload = {
+  /**
+   * Text describing the function of the milestone
+   */
+  description: string;
+};
 
+/**
+ * Multi Release Milestone Payload
+ */
+type MultiReleaseMilestonePayload = {
+  /**
+   * Text describing the function of the milestone
+   */
+  description: string;
+
+  /**
+   * Amount to be transferred upon completion of this milestone
+   */
+  amount: string;
+};
+
+// ----------------- Initialize Escrow -----------------
 /**
  * Single Release Initialize Escrow Payload
  */
-export type SingleReleaseInitializeEscrowPayload = BaseInitializeEscrowPayload;
+export type SingleReleaseInitializeEscrowPayload = Omit<
+  Escrow,
+  "contractId" | "balance"
+> & {
+  /**
+   * Objectives to be completed to define the escrow as completed
+   */
+  milestones: SingleReleaseMilestonePayload[];
+};
 
 /**
  * Multi Release Initialize Escrow Payload
  */
 export type MultiReleaseInitializeEscrowPayload = Omit<
-  BaseInitializeEscrowPayload,
-  "amount" | "flags"
+  MultiReleaseEscrow,
+  "contractId" | "balance"
 > & {
   /**
    * Objectives to be completed to define the escrow as completed
    */
-  milestones: MultiReleaseMilestone[];
+  milestones: MultiReleaseMilestonePayload[];
 };
 
-/**
- * Initialize Escrow Payload, this can be a single-release or multi-release
- */
 export type InitializeEscrowPayload =
   | SingleReleaseInitializeEscrowPayload
   | MultiReleaseInitializeEscrowPayload;
