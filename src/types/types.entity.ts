@@ -1,7 +1,7 @@
 /**
  * Milestone
  */
-export type Milestone = {
+export type BaseMilestone = {
   /**
    * Text describing the function of the milestone.
    */
@@ -16,31 +16,47 @@ export type Milestone = {
    * Evidence of work performed by the service provider.
    */
   evidence: string;
-
-  /**
-   * Flags validating certain milestone life states
-   */
-  flags?: Flags;
 };
 
 /**
  * Single Release Milestone
  */
-export type SingleReleaseMilestone = Milestone & {
+export type SingleReleaseMilestone = BaseMilestone & {
   /**
-   * Approved flag
+   * Type discriminator for single release milestone
    */
-  flags?: Omit<Flags, "released" | "resolved" | "disputed">;
+  type: "single-release";
+
+  /**
+   * Approved flag, only if the escrow is single-release
+   */
+  approved: boolean;
 };
+
 /**
  * Multi Release Milestone
  */
-export type MultiReleaseMilestone = Milestone & {
+export type MultiReleaseMilestone = BaseMilestone & {
+  /**
+   * Type discriminator for multi release milestone
+   */
+  type: "multi-release";
+
   /**
    * Amount to be transferred upon completion of this milestone
    */
   amount: string;
+
+  /**
+   * Flags validating certain milestone life states, only if the escrow is multi-release
+   */
+  flags?: Flags;
 };
+
+/**
+ * Milestone
+ */
+export type Milestone = SingleReleaseMilestone | MultiReleaseMilestone;
 
 /**
  * Escrow
