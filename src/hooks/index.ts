@@ -11,4 +11,4 @@ export { useGetMultipleEscrowBalances } from "../hooks/useGetMultipleEscrowBalan
 export { useReleaseFunds } from "../hooks/useReleaseFunds";
 export { useFundEscrow } from "../hooks/useFundEscrow";
 export { useChangeMilestoneStatus } from "../hooks/useChangeMilestoneStatus";
-export { useChangeMilestoneApprovedFlag } from "../hooks/useChangeMilestoneApprovedFlag";
+export { useApproveMilestone } from "../hooks/useApproveMilestone";

@@ -1,7 +1,7 @@
 /**
  * Milestone
  */
-export type Milestone = {
+export type BaseMilestone = {
   /**
    * Text describing the function of the milestone.
    */
@@ -16,72 +16,42 @@ export type Milestone = {
    * Evidence of work performed by the service provider.
    */
   evidence: string;
-
-  /**
-   * Flag indicating whether a milestone has been approved by the approver.
-   */
-  approvedFlag: boolean;
 };
 
 /**
- * Roles
+ * Single Release Milestone
  */
-export type Roles = {
+export type SingleReleaseMilestone = BaseMilestone & {
   /**
-   * Address of the entity requiring the service.
+   * Approved flag, only if the escrow is single-release
    */
-  approver: string;
-
-  /**
-   * Address of the entity providing the service.
-   */
-  serviceProvider: string;
-
-  /**
-   * Address of the entity that owns the escrow
-   */
-  platformAddress: string;
-
-  /**
-   * Address of the user in charge of releasing the escrow funds to the service provider.
-   */
-  releaseSigner: string;
-
-  /**
-   * Address in charge of resolving disputes within the escrow.
-   */
-  disputeResolver: string;
-
-  /**
-   * Address where escrow proceeds will be sent to
-   */
-  receiver: string;
+  approved: boolean;
 };
 
 /**
- * Flags
+ * Multi Release Milestone
  */
-export type Flags = {
+export type MultiReleaseMilestone = BaseMilestone & {
   /**
-   * Flag indicating that an escrow is in dispute.
+   * Amount to be transferred upon completion of this milestone
    */
-  disputeFlag?: boolean;
+  amount: string;
 
   /**
-   * Flag indicating that escrow funds have already been released.
+   * Flags validating certain milestone life states, only if the escrow is multi-release
    */
-  releaseFlag?: boolean;
-
-  /**
-   * Flag indicating that a disputed escrow has already been resolved.
-   */
-  resolvedFlag?: boolean;
+  flags?: Flags;
 };
+
+/**
+ * Milestone
+ */
+export type Milestone = SingleReleaseMilestone & MultiReleaseMilestone;
 
 /**
  * Escrow
  */
-export interface Escrow {
+export type Escrow = {
   /**
    * Address of the user signing the contract transaction
    */
@@ -130,7 +100,7 @@ export interface Escrow {
   /**
    * Objectives to be completed to define the escrow as completed
    */
-  milestones: Milestone[];
+  milestones: SingleReleaseMilestone[];
 
   /**
    * Flags validating certain escrow life states
@@ -146,12 +116,27 @@ export interface Escrow {
    * Field used to identify the recipient's address in transactions through an intermediary account. This value is included as a memo in the transaction and allows the funds to be correctly routed to the wallet of the specified recipient
    */
   receiverMemo: number;
-}
+};
+
+/**
+ * Single Release Escrow
+ */
+export type SingleReleaseEscrow = Escrow;
+
+/**
+ * Multi Release Escrow
+ */
+export type MultiReleaseEscrow = Omit<
+  Escrow,
+  "milestones" | "flags" | "amount"
+> & {
+  milestones: MultiReleaseMilestone[];
+};
 
 /**
  * Trustline
  */
-export interface Trustline {
+export type Trustline = {
   /**
    * Public address establishing permission to accept and use a specific token.
    */
@@ -161,4 +146,64 @@ export interface Trustline {
    * Number of decimals into which the token is divided.
    */
   decimals: number;
-}
+};
+
+/**
+ * Roles
+ */
+export type Roles = {
+  /**
+   * Address of the entity requiring the service.
+   */
+  approver: string;
+
+  /**
+   * Address of the entity providing the service.
+   */
+  serviceProvider: string;
+
+  /**
+   * Address of the entity that owns the escrow
+   */
+  platformAddress: string;
+
+  /**
+   * Address of the user in charge of releasing the escrow funds to the service provider.
+   */
+  releaseSigner: string;
+
+  /**
+   * Address in charge of resolving disputes within the escrow.
+   */
+  disputeResolver: string;
+
+  /**
+   * Address where escrow proceeds will be sent to
+   */
+  receiver: string;
+};
+
+/**
+ * Flags
+ */
+export type Flags = {
+  /**
+   * Flag indicating that an escrow is in dispute.
+   */
+  disputed?: boolean;
+
+  /**
+   * Flag indicating that escrow funds have already been released.
+   */
+  released?: boolean;
+
+  /**
+   * Flag indicating that a disputed escrow has already been resolved.
+   */
+  resolved?: boolean;
+
+  /**
+   * Flag indicating whether a milestone has been approved by the approver.
+   */
+  approved?: boolean;
+};

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { GetEscrowParams } from "../types";
+import { EscrowType, GetEscrowParams } from "../types";
 
 /**
  * Use the useGetEscrow hook to get an escrow.
@@ -11,7 +11,13 @@ export function useGetEscrow() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (payload: GetEscrowParams) => client.getEscrow(payload),
+    mutationFn: ({
+      payload,
+      type,
+    }: {
+      payload: GetEscrowParams;
+      type: EscrowType;
+    }) => client.getEscrow(payload, type),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["escrows"] });
     },

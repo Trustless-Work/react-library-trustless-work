@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { ChangeMilestoneStatusPayload } from "../types";
+import { ChangeMilestoneStatusPayload, EscrowType } from "../types";
 
 /**
  * Use the useChangeMilestoneStatus hook to change the status of a milestone.
@@ -11,8 +11,13 @@ export function useChangeMilestoneStatus() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (payload: ChangeMilestoneStatusPayload) =>
-      client.changeMilestoneStatus(payload),
+    mutationFn: ({
+      payload,
+      type,
+    }: {
+      payload: ChangeMilestoneStatusPayload;
+      type: EscrowType;
+    }) => client.changeMilestoneStatus(payload, type),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["escrows"] });
     },

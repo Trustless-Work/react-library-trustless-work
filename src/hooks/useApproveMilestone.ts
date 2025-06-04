@@ -1,25 +1,30 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { ChangeMilestoneApprovedFlagPayload } from "../types";
+import { ApproveMilestonePayload, EscrowType } from "../types";
 
 /**
- * Use the useChangeMilestoneApprovedFlag hook to change the approved flag of a milestone.
+ * Use the useApproveMilestone hook to change the approved flag of a milestone.
  * @returns A mutation function to change the approved flag of a milestone.
  */
-export function useChangeMilestoneApprovedFlag() {
+export function useApproveMilestone() {
   const client = useTrustlessWorkClient();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (payload: ChangeMilestoneApprovedFlagPayload) =>
-      client.changeMilestoneApprovedFlag(payload),
+    mutationFn: ({
+      payload,
+      type,
+    }: {
+      payload: ApproveMilestonePayload;
+      type: EscrowType;
+    }) => client.approveMilestone(payload, type),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["escrows"] });
     },
   });
 
   return {
-    changeMilestoneApprovedFlag: mutation.mutateAsync,
+    approveMilestone: mutation.mutateAsync,
     isPending: mutation.isPending,
     isError: mutation.isError,
     isSuccess: mutation.isSuccess,
