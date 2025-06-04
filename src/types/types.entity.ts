@@ -23,11 +23,6 @@ export type BaseMilestone = {
  */
 export type SingleReleaseMilestone = BaseMilestone & {
   /**
-   * Type discriminator for single release milestone
-   */
-  type: "single-release";
-
-  /**
    * Approved flag, only if the escrow is single-release
    */
   approved: boolean;
@@ -37,11 +32,6 @@ export type SingleReleaseMilestone = BaseMilestone & {
  * Multi Release Milestone
  */
 export type MultiReleaseMilestone = BaseMilestone & {
-  /**
-   * Type discriminator for multi release milestone
-   */
-  type: "multi-release";
-
   /**
    * Amount to be transferred upon completion of this milestone
    */
@@ -56,7 +46,7 @@ export type MultiReleaseMilestone = BaseMilestone & {
 /**
  * Milestone
  */
-export type Milestone = SingleReleaseMilestone | MultiReleaseMilestone;
+export type Milestone = SingleReleaseMilestone & MultiReleaseMilestone;
 
 /**
  * Escrow
