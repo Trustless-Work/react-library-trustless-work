@@ -8,7 +8,7 @@ import { Escrow, MultiReleaseEscrow } from "./types.entity";
 /**
  * Single Release Milestone Payload
  */
-type SingleReleaseMilestonePayload = {
+export type SingleReleaseMilestonePayload = {
   /**
    * Text describing the function of the milestone
    */
@@ -18,12 +18,11 @@ type SingleReleaseMilestonePayload = {
 /**
  * Multi Release Milestone Payload
  */
-type MultiReleaseMilestonePayload = {
+export type MultiReleaseMilestonePayload = {
   /**
    * Text describing the function of the milestone
    */
   description: string;
-
   /**
    * Amount to be transferred upon completion of this milestone
    */
@@ -36,7 +35,7 @@ type MultiReleaseMilestonePayload = {
  */
 export type SingleReleaseInitializeEscrowPayload = Omit<
   Escrow,
-  "contractId" | "balance"
+  "contractId" | "balance" | "milestones"
 > & {
   /**
    * Objectives to be completed to define the escrow as completed
@@ -49,7 +48,7 @@ export type SingleReleaseInitializeEscrowPayload = Omit<
  */
 export type MultiReleaseInitializeEscrowPayload = Omit<
   MultiReleaseEscrow,
-  "contractId" | "balance"
+  "contractId" | "balance" | "milestones"
 > & {
   /**
    * Objectives to be completed to define the escrow as completed
