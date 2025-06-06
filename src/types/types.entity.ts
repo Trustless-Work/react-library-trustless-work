@@ -10,12 +10,12 @@ export type BaseMilestone = {
   /**
    * Milestone status. Ex: Approved, In dispute, etc...
    */
-  status: string;
+  status?: string;
 
   /**
    * Evidence of work performed by the service provider.
    */
-  evidence: string;
+  evidence?: string;
 };
 
 /**
