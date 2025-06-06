@@ -1,7 +1,7 @@
 /**
  * Milestone
  */
-export type BaseMilestone = {
+type BaseMilestone = {
   /**
    * Text describing the function of the milestone.
    */
@@ -44,14 +44,9 @@ export type MultiReleaseMilestone = BaseMilestone & {
 };
 
 /**
- * Milestone
+ * Single Release Escrow
  */
-export type Milestone = SingleReleaseMilestone & MultiReleaseMilestone;
-
-/**
- * Escrow
- */
-export type Escrow = {
+export type SingleReleaseEscrow = {
   /**
    * Address of the user signing the contract transaction
    */
@@ -119,15 +114,10 @@ export type Escrow = {
 };
 
 /**
- * Single Release Escrow
- */
-export type SingleReleaseEscrow = Escrow;
-
-/**
  * Multi Release Escrow
  */
 export type MultiReleaseEscrow = Omit<
-  Escrow,
+  SingleReleaseEscrow,
   "milestones" | "flags" | "amount"
 > & {
   milestones: MultiReleaseMilestone[];
