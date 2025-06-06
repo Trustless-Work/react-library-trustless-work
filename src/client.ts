@@ -1,28 +1,38 @@
 import axios, { AxiosInstance } from "axios";
 import {
   baseURL,
-  InitializeEscrowResponse,
-  UpdateEscrowResponse,
+  InitializeMultiReleaseEscrowResponse,
+  InitializeSingleReleaseEscrowResponse,
+  MultiReleaseEscrow,
+  SingleReleaseEscrow,
+  UpdateMultiReleaseEscrowResponse,
+  UpdateSingleReleaseEscrowResponse,
 } from "./types";
 import {
   ChangeMilestoneStatusPayload,
   FundEscrowPayload,
   GetBalanceParams,
   GetEscrowParams,
-  InitializeEscrowPayload,
-  ReleaseFundsPayload,
-  ResolveDisputePayload,
-  StartDisputePayload,
-  UpdateEscrowPayload,
 } from "./types";
 import {
   EscrowRequestResponse,
   GetEscrowBalancesResponse,
   SendTransactionResponse,
 } from "./types";
-import { Escrow } from "./types";
 import { EscrowType } from "./types/types";
-import { ApproveMilestonePayload } from "./types/types.payload";
+import {
+  ApproveMilestonePayload,
+  InitializeMultiReleaseEscrowPayload,
+  InitializeSingleReleaseEscrowPayload,
+  MultiReleaseReleaseFundsPayload,
+  MultiReleaseResolveDisputePayload,
+  MultiReleaseStartDisputePayload,
+  SingleReleaseReleaseFundsPayload,
+  SingleReleaseResolveDisputePayload,
+  SingleReleaseStartDisputePayload,
+  UpdateMultiReleaseEscrowPayload,
+  UpdateSingleReleaseEscrowPayload,
+} from "./types/types.payload";
 
 export class TrustlessWorkClient {
   private axios: AxiosInstance;
@@ -54,8 +64,10 @@ export class TrustlessWorkClient {
     return this.axios
       .post<
         | SendTransactionResponse
-        | InitializeEscrowResponse
-        | UpdateEscrowResponse
+        | InitializeSingleReleaseEscrowResponse
+        | InitializeMultiReleaseEscrowResponse
+        | UpdateSingleReleaseEscrowResponse
+        | UpdateMultiReleaseEscrowResponse
       >("/helper/send-transaction", { signedXdr })
       .then((r) => r.data);
   }
@@ -66,7 +78,12 @@ export class TrustlessWorkClient {
    * @param type - The type of escrow (single-release or multi-release) to initialize
    * @returns The response from the API EscrowRequestResponse, but you can set as InitializeEscrowResponse
    */
-  initializeEscrow(data: InitializeEscrowPayload, type: EscrowType) {
+  initializeEscrow(
+    data:
+      | InitializeSingleReleaseEscrowPayload
+      | InitializeMultiReleaseEscrowPayload,
+    type: EscrowType
+  ) {
     return this.axios
       .post<EscrowRequestResponse>(`/deployer/${type}`, data)
       .then((r) => r.data);
@@ -78,7 +95,10 @@ export class TrustlessWorkClient {
    * @param type - The type of escrow (single-release or multi-release) to update
    * @returns The response from the API EscrowRequestResponse, but you can set as UpdateEscrowResponse
    */
-  updateEscrow(data: UpdateEscrowPayload, type: EscrowType) {
+  updateEscrow(
+    data: UpdateSingleReleaseEscrowPayload | UpdateMultiReleaseEscrowPayload,
+    type: EscrowType
+  ) {
     return this.axios
       .put<EscrowRequestResponse>(`/escrow/${type}/update-escrow`, data)
       .then((r) => r.data);
@@ -129,7 +149,10 @@ export class TrustlessWorkClient {
    * @param type - The type of escrow (single-release or multi-release) to release
    * @returns The response from the API EscrowRequestResponse
    */
-  releaseFunds(data: ReleaseFundsPayload, type: EscrowType) {
+  releaseFunds(
+    data: SingleReleaseReleaseFundsPayload | MultiReleaseReleaseFundsPayload,
+    type: EscrowType
+  ) {
     const endpoint =
       type === "single-release" ? "release-funds" : "release-milestone-funds";
     return this.axios
@@ -143,7 +166,12 @@ export class TrustlessWorkClient {
    * @param type - The type of escrow (single-release or multi-release) to resolve
    * @returns The response from the API EscrowRequestResponse
    */
-  resolveDispute(data: ResolveDisputePayload, type: EscrowType) {
+  resolveDispute(
+    data:
+      | SingleReleaseResolveDisputePayload
+      | MultiReleaseResolveDisputePayload,
+    type: EscrowType
+  ) {
     const endpoint =
       type === "single-release"
         ? "resolve-dispute"
@@ -159,7 +187,10 @@ export class TrustlessWorkClient {
    * @param type - The type of escrow (single-release or multi-release) to start
    * @returns The response from the API EscrowRequestResponse
    */
-  startDispute(data: StartDisputePayload, type: EscrowType) {
+  startDispute(
+    data: SingleReleaseStartDisputePayload | MultiReleaseStartDisputePayload,
+    type: EscrowType
+  ) {
     const endpoint =
       type === "single-release" ? "dispute-escrow" : "dispute-milestone";
     return this.axios
@@ -175,9 +206,12 @@ export class TrustlessWorkClient {
    */
   getEscrow(data: GetEscrowParams, type: EscrowType) {
     return this.axios
-      .get<Escrow>(`/escrow/${type}/get-escrow`, {
-        params: data,
-      })
+      .get<SingleReleaseEscrow | MultiReleaseEscrow>(
+        `/escrow/${type}/get-escrow`,
+        {
+          params: data,
+        }
+      )
       .then((r) => r.data);
   }
 
