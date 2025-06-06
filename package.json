@@ -1,6 +1,6 @@
 {
   "name": "@trustless-work/escrow",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
