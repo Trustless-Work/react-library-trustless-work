@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { InitializeEscrowPayload } from "../types";
+import {
+  InitializeSingleReleaseEscrowPayload,
+  InitializeMultiReleaseEscrowPayload,
+} from "../types/types.payload";
 import { EscrowType } from "../types/types";
 
 /**
@@ -16,7 +19,9 @@ export function useInitializeEscrow() {
       payload,
       type,
     }: {
-      payload: InitializeEscrowPayload;
+      payload:
+        | InitializeSingleReleaseEscrowPayload
+        | InitializeMultiReleaseEscrowPayload;
       type: EscrowType;
     }) => client.initializeEscrow(payload, type),
     onSuccess: (data) => {

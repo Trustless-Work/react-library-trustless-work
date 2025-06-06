@@ -1,6 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { EscrowType, ReleaseFundsPayload } from "../types";
+import {
+  SingleReleaseReleaseFundsPayload,
+  MultiReleaseReleaseFundsPayload,
+} from "../types/types.payload";
+import { EscrowType } from "../types/types";
 
 /**
  * Use the useReleaseFunds hook to release funds from an escrow.
@@ -15,7 +19,9 @@ export function useReleaseFunds() {
       payload,
       type,
     }: {
-      payload: ReleaseFundsPayload;
+      payload:
+        | SingleReleaseReleaseFundsPayload
+        | MultiReleaseReleaseFundsPayload;
       type: EscrowType;
     }) => client.releaseFunds(payload, type),
     onSuccess: (data) => {
