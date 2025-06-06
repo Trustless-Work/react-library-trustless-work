@@ -25,7 +25,7 @@ export type SingleReleaseMilestone = BaseMilestone & {
   /**
    * Approved flag, only if the escrow is single-release
    */
-  approved: boolean;
+  approved?: boolean;
 };
 
 /**
