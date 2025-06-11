@@ -218,13 +218,17 @@ export class TrustlessWorkClient {
   /**
    * Get multiple balances
    * @param data - The data (GetBalanceParams) to get
+   * @param type - The type of escrow (single-release or multi-release) to get
    * @returns The response from the API GetEscrowBalancesResponse
    */
-  getMultipleEscrowBalances(data: GetBalanceParams) {
+  getMultipleEscrowBalances(data: GetBalanceParams, type: EscrowType) {
     return this.axios
-      .get<GetEscrowBalancesResponse[]>("/helper/get-multiple-escrow-balance", {
-        params: data,
-      })
+      .get<GetEscrowBalancesResponse[]>(
+        `/escrow/${type}/get-multiple-escrow-balance`,
+        {
+          params: data,
+        }
+      )
       .then((r) => r.data);
   }
 }

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTrustlessWorkClient } from "../provider";
-import { GetBalanceParams } from "../types";
+import { EscrowType, GetBalanceParams } from "../types";
 
 /**
  * Use the useGetMultipleEscrowBalances hook to get multiple escrow balances.
@@ -11,8 +11,13 @@ export function useGetMultipleEscrowBalances() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (payload: GetBalanceParams) =>
-      client.getMultipleEscrowBalances(payload),
+    mutationFn: ({
+      payload,
+      type,
+    }: {
+      payload: GetBalanceParams;
+      type: EscrowType;
+    }) => client.getMultipleEscrowBalances(payload, type),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["escrows"] });
     },
