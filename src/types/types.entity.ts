@@ -90,7 +90,7 @@ export type SingleReleaseEscrow = {
   /**
    * Amount of the token (XLM, USDC, EURC, etc) in the smart contract.
    */
-  balance: string;
+  balance: number;
 
   /**
    * Objectives to be completed to define the escrow as completed
