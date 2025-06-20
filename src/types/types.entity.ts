@@ -35,7 +35,7 @@ export type MultiReleaseMilestone = BaseMilestone & {
   /**
    * Amount to be transferred upon completion of this milestone
    */
-  amount: string;
+  amount: number;
 
   /**
    * Flags validating certain milestone life states, only if the escrow is multi-release
@@ -80,12 +80,12 @@ export type SingleReleaseEscrow = {
   /**
    * Amount to be transferred upon completion of escrow milestones
    */
-  amount: string;
+  amount: number;
 
   /**
    * Commission that the platform will receive when the escrow is completed
    */
-  platformFee: string;
+  platformFee: number;
 
   /**
    * Amount of the token (XLM, USDC, EURC, etc) in the smart contract.
