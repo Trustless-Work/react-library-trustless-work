@@ -192,12 +192,12 @@ export type SingleReleaseResolveDisputePayload = {
   /**
    * Amount of funds to be returned to the approver based on the global amount.
    */
-  approverFunds: string;
+  approverFunds: number;
 
   /**
    * Amount of funds to be returned to the receiver based on the global amount.
    */
-  receiverFunds: string;
+  receiverFunds: number;
 };
 
 /**
