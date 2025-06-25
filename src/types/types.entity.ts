@@ -174,6 +174,18 @@ export type Roles = {
 };
 
 /**
+ * Role
+ */
+export type Role =
+  | "approver"
+  | "serviceProvider"
+  | "platformAddress"
+  | "releaseSigner"
+  | "disputeResolver"
+  | "receiver"
+  | "signer";
+
+/**
  * Flags
  */
 export type Flags = {

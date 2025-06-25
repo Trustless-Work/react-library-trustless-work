@@ -19,6 +19,7 @@ export type { InitializeMultiReleaseEscrowResponse } from "./types.response";
 export type { UpdateSingleReleaseEscrowResponse } from "./types.response";
 export type { UpdateMultiReleaseEscrowResponse } from "./types.response";
 export type { GetEscrowBalancesResponse } from "./types.response";
+export type { GetEscrowsFromIndexerResponse } from "./types.response";
 
 /**
  * Types for the Trustless Work API
@@ -45,3 +46,5 @@ export type { MultiReleaseReleaseFundsPayload } from "./types.payload";
 export type { UpdateSingleReleaseEscrowPayload } from "./types.payload";
 export type { UpdateMultiReleaseEscrowPayload } from "./types.payload";
 export type { GetBalanceParams } from "./types.payload";
+export type { GetEscrowsFromIndexerBySignerParams } from "./types.payload";
+export type { GetEscrowsFromIndexerByRoleParams } from "./types.payload";

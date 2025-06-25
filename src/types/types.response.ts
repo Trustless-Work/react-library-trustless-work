@@ -1,5 +1,13 @@
-import { Status } from "./types";
-import { MultiReleaseEscrow, SingleReleaseEscrow } from "./types.entity";
+import { Date, EscrowType, Status } from "./types";
+import {
+  Flags,
+  MultiReleaseEscrow,
+  MultiReleaseMilestone,
+  Roles,
+  SingleReleaseEscrow,
+  SingleReleaseMilestone,
+  Trustline,
+} from "./types.entity";
 
 /**
  * Escrow's Response like fund, release, change, etc ...
@@ -87,4 +95,34 @@ export type GetEscrowBalancesResponse = {
    * Balance of the escrow
    */
   balance: number;
+};
+
+/**
+ * Get Escrows From Indexer Response
+ */
+export type GetEscrowsFromIndexerResponse = {
+  signer?: string;
+  contractId?: string;
+  engagementId: string;
+  title: string;
+  roles: Roles;
+  description: string;
+  amount: number;
+  platformFee: number;
+  balance?: number;
+  milestones:
+    | SingleReleaseMilestone[]
+    | (MultiReleaseMilestone[] & { disputeStartedBy: Roles });
+  flags?: Flags;
+  trustline: Trustline & { name: string };
+  receiverMemo?: number;
+  disputeStartedBy?: string;
+  fundedBy?: string;
+  isActive?: boolean;
+  approverFunds?: string;
+  receiverFunds?: string;
+  user: string;
+  createdAt: Date;
+  updatedAt: Date;
+  type: EscrowType;
 };

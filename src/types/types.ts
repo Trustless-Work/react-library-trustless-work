@@ -11,6 +11,16 @@ export type baseURL =
 export type EscrowType = "single-release" | "multi-release";
 
 /**
+ * Escrow Status
+ */
+export type SingleReleaseEscrowStatus =
+  | "working"
+  | "pendingRelease"
+  | "released"
+  | "resolved"
+  | "inDispute";
+
+/**
  * Http Method
  */
 export type HttpMethod = "get" | "post" | "put" | "delete";
@@ -19,3 +29,11 @@ export type HttpMethod = "get" | "post" | "put" | "delete";
  * Unique possible statuses for a Trustless Work request
  */
 export type Status = "SUCCESS" | "FAILED";
+
+/**
+ * Date
+ */
+export type Date = {
+  seconds: number;
+  nanoseconds: number;
+};

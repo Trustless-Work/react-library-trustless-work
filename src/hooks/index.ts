@@ -12,3 +12,5 @@ export { useReleaseFunds } from "../hooks/useReleaseFunds";
 export { useFundEscrow } from "../hooks/useFundEscrow";
 export { useChangeMilestoneStatus } from "../hooks/useChangeMilestoneStatus";
 export { useApproveMilestone } from "../hooks/useApproveMilestone";
+export { useGetEscrowsFromIndexerBySigner } from "../hooks/useGetEscrowsFromIndexerBySigner";
+export { useGetEscrowsFromIndexerByRole } from "../hooks/useGetEscrowsFromIndexerByRole";

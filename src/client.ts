@@ -22,6 +22,8 @@ import {
 import { EscrowType } from "./types/types";
 import {
   ApproveMilestonePayload,
+  GetEscrowsFromIndexerByRoleParams,
+  GetEscrowsFromIndexerBySignerParams,
   InitializeMultiReleaseEscrowPayload,
   InitializeSingleReleaseEscrowPayload,
   MultiReleaseReleaseFundsPayload,
@@ -33,6 +35,7 @@ import {
   UpdateMultiReleaseEscrowPayload,
   UpdateSingleReleaseEscrowPayload,
 } from "./types/types.payload";
+import { GetEscrowsFromIndexerResponse } from "./types/types.response";
 
 export class TrustlessWorkClient {
   private axios: AxiosInstance;
@@ -229,6 +232,32 @@ export class TrustlessWorkClient {
           params: data,
         }
       )
+      .then((r) => r.data);
+  }
+
+  /**
+   * Get multiple escrows from the indexed by signer
+   * @param data - The data (GetEscrowsFromIndexerBySignerParams) to get
+   * @returns The response from the API GetEscrowsFromDBResponse
+   */
+  getEscrowsFromIndexerBySigner(data: GetEscrowsFromIndexerBySignerParams) {
+    return this.axios
+      .get<GetEscrowsFromIndexerResponse[]>(`/helper/get-escrows-by-signer`, {
+        params: data,
+      })
+      .then((r) => r.data);
+  }
+
+  /**
+   * Get multiple escrows from the indexed by role
+   * @param data - The data (GetEscrowsFromIndexerByRoleParams) to get
+   * @returns The response from the API GetEscrowsFromIndexerResponse
+   */
+  getEscrowsFromIndexerByRole(data: GetEscrowsFromIndexerByRoleParams) {
+    return this.axios
+      .get<GetEscrowsFromIndexerResponse[]>(`/helper/get-escrows-by-role`, {
+        params: data,
+      })
       .then((r) => r.data);
   }
 }
