@@ -11,8 +11,8 @@ export function useGetEscrowsFromIndexerByRole() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: ({ payload }: { payload: GetEscrowsFromIndexerByRoleParams }) =>
-      client.getEscrowsFromIndexerByRole(payload),
+    mutationFn: ({ params }: { params: GetEscrowsFromIndexerByRoleParams }) =>
+      client.getEscrowsFromIndexerByRole(params),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["escrows"] });
     },

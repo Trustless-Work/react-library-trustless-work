@@ -11,11 +11,8 @@ export function useGetEscrowsFromIndexerBySigner() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: ({
-      payload,
-    }: {
-      payload: GetEscrowsFromIndexerBySignerParams;
-    }) => client.getEscrowsFromIndexerBySigner(payload),
+    mutationFn: ({ params }: { params: GetEscrowsFromIndexerBySignerParams }) =>
+      client.getEscrowsFromIndexerBySigner(params),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["escrows"] });
     },

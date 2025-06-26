@@ -275,9 +275,14 @@ export type GetEscrowsFromIndexerParams = {
   orderBy?: "createdAt" | "updatedAt" | "amount";
 
   /**
-   * Created at. Filtering
+   * Created at = start date. Filtering
    */
-  createdAt?: string;
+  startDate?: string;
+
+  /**
+   * Created at = end date. Filtering
+   */
+  endDate?: string;
 
   /**
    * Max amount. Filtering

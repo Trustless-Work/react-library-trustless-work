@@ -6,6 +6,7 @@ export type { MultiReleaseEscrow } from "./types.entity";
 export type { SingleReleaseMilestone } from "./types.entity";
 export type { MultiReleaseMilestone } from "./types.entity";
 export type { Roles } from "./types.entity";
+export type { Role } from "./types.entity";
 export type { Flags } from "./types.entity";
 export type { Trustline } from "./types.entity";
 
