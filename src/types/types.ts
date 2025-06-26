@@ -34,6 +34,6 @@ export type Status = "SUCCESS" | "FAILED";
  * Date
  */
 export type Date = {
-  seconds: number;
-  nanoseconds: number;
+  _seconds: number;
+  _nanoseconds: number;
 };
