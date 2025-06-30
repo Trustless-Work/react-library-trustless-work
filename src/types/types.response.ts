@@ -110,14 +110,10 @@ export type GetEscrowsFromIndexerResponse = {
   amount: number;
   platformFee: number;
   balance?: number;
-  milestones:
-    | SingleReleaseMilestone[]
-    | (MultiReleaseMilestone[] & { disputeStartedBy: Roles });
+  milestones: SingleReleaseMilestone[] | MultiReleaseMilestone[];
   flags?: Flags;
   trustline: Trustline & { name: string };
   receiverMemo?: number;
-  disputeStartedBy?: string;
-  fundedBy?: string;
   isActive?: boolean;
   approverFunds?: string;
   receiverFunds?: string;
