@@ -1,6 +1,6 @@
 {
   "name": "@trustless-work/escrow",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -68,7 +68,6 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.76.1",
     "axios": "^1.9.0"
   }
 }

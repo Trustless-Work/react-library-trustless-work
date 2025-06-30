@@ -1,7 +1,6 @@
 "use client";
 
 import React, { ReactNode, useContext, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { baseURL } from "./types";
 import { TrustlessWorkClient } from "./client";
 
@@ -21,11 +20,10 @@ export const TrustlessWorkConfig = ({
   children,
 }: TrustlessWorkConfigProps) => {
   const [client] = useState(() => new TrustlessWorkClient(baseURL, apiKey));
-  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <TrustlessWorkContext.Provider value={{ client }}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      {children}
     </TrustlessWorkContext.Provider>
   );
 };
