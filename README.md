@@ -14,7 +14,7 @@ yarn add @trustless-work/escrow
 
 ## Quick Start
 
-1. Trustless Work React provides the TrustlessWorkConfig to provides all the custom hooks and entities to the whole project. To achieve this you'll need to create a Provider.
+1. Trustless Work React provides the TrustlessWorkConfig to provide all the custom hooks and entities to the whole project. To achieve this you'll need to create a Provider.
 
 ```tsx
 "use client"; // make sure this is a client component
@@ -69,12 +69,81 @@ export function App() {
 import { useInitializeEscrow, useGetEscrow } from '@trustless-work/escrow/hooks';
 
 function YourComponent() {
-  const { initializeEscrow } = useInitializeEscrow();
-  const { getEscrow, escrow } = useGetEscrow();
+  const { deployEscrow } = useInitializeEscrow();
+  const { getEscrow } = useGetEscrow();
 
-  await getEscrow({ contractId: 'your-escrow-id', signer: 'signer-wallet' });
   // Use the hooks...
 }
+```
+
+## State Management Integration
+
+This library is designed to be flexible and work with any state management solution. The hooks expose functions that you can integrate with your preferred state management library.
+
+### With TanStack Query (Recommended)
+
+```tsx
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TrustlessWorkConfig } from '@trustless-work/escrow';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+    },
+  },
+});
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TrustlessWorkConfig baseURL={development} apiKey={apiKey}>
+        <YourApp />
+      </TrustlessWorkConfig>
+    </QueryClientProvider>
+  );
+}
+
+// Usage in components
+import { useQuery } from '@tanstack/react-query';
+import { useGetEscrowsFromIndexerByRole } from '@trustless-work/escrow/hooks';
+
+export const useEscrowsByRoleQuery = (params) => {
+  const { getEscrowsByRole } = useGetEscrowsFromIndexerByRole();
+
+  return useQuery({
+    queryKey: ["escrows", params.roleAddress, params.role],
+    queryFn: () => getEscrowsByRole(params),
+    enabled: !!params.roleAddress && !!params.role,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+```
+
+### With Zustand
+
+```tsx
+import { create } from 'zustand';
+import { useGetEscrowsFromIndexerByRole } from '@trustless-work/escrow/hooks';
+
+const useEscrowStore = create((set, get) => ({
+  escrows: [],
+  isLoading: false,
+  error: null,
+  
+  fetchEscrows: async (params) => {
+    const { getEscrowsByRole } = useGetEscrowsFromIndexerByRole();
+    
+    set({ isLoading: true, error: null });
+    try {
+      const escrows = await getEscrowsByRole(params);
+      set({ escrows, isLoading: false });
+    } catch (error) {
+      set({ error, isLoading: false });
+    }
+  },
+}));
 ```
 
 ## Available Hooks
@@ -93,11 +162,14 @@ function YourComponent() {
 
 ### Milestone Management
 - `useChangeMilestoneStatus`: Update milestone status
-- `useChangeMilestoneApprovedFlag`: Approve or reject milestones
+- `useApproveMilestone`: Approve or reject milestones
 
 ### Transaction Management
 - `useSendTransaction`: Send a transaction
 
+### Data Fetching
+- `useGetEscrowsFromIndexerByRole`: Get escrows by role
+- `useGetEscrowsFromIndexerBySigner`: Get escrows by signer
 
 ## Types
 
@@ -118,16 +190,18 @@ Make sure to:
 1. Use the correct `baseURL` for your environment
 2. Store your API key in environment variables
 3. Use the appropriate API key for your environment
-4. You can get the API Key from the Trustless Work dApp. Make sure to use the correct API key for the environment you are using. We recommed save this apiKey in your .env file.
+4. You can get the API Key from the Trustless Work dApp. Make sure to use the correct API key for the environment you are using. We recommend saving this apiKey in your .env file.
    * - "https://dapp.trustlesswork.com" (production)
    * - "https://dapp.dev.trustlesswork.com" (development)
 
 ## Best Practices
 
-1. **Error Handling**: All hooks return error states that you should handle appropriately
-2. **Loading States**: Use the loading states provided by the hooks to show loading indicators
-3. **Type Safety**: Take advantage of TypeScript types for better development experience
-4. **API Key Security**: Never expose your API key in client-side code. Use environment variables
+1. **State Management**: Choose the state management solution that best fits your project needs
+2. **Error Handling**: Implement proper error handling for all API calls
+3. **Loading States**: Use loading states to provide better user experience
+4. **Type Safety**: Take advantage of TypeScript types for better development experience
+5. **API Key Security**: Never expose your API key in client-side code. Use environment variables
+6. **Caching**: Implement appropriate caching strategies for better performance
 
 ## Example Usage
 
@@ -145,12 +219,12 @@ export const useInitializeEscrowForm = () => {
  /*
   *  useInitializeEscrow
  */
- const { deployEscrow, isPending, isError, isSuccess } = useInitializeEscrow();
+ const { deployEscrow } = useInitializeEscrow();
  
  /*
   *  useSendTransaction
  */
- const { sendTransaction, isPending, isError, isSuccess } = useSendTransaction();
+ const { sendTransaction } = useSendTransaction();
 
 /*
  * onSubmit function, this could be called by form button
@@ -165,7 +239,8 @@ export const useInitializeEscrowForm = () => {
        * - The result will be an unsigned transaction
        */
       const { unsignedTransaction } = await deployEscrow(
-        payload
+        payload,
+        "single-release" // or "multi-release"
       );
 
       if (!unsignedTransaction) {
@@ -193,10 +268,7 @@ export const useInitializeEscrowForm = () => {
        * - We need to send the signed transaction to the API
        * - The data will be an SendTransactionResponse
        */
-      const data = await sendTransaction({
-        signedXdr,
-        returnEscrowDataIsRequired: true, // make sure that in initialize this property is true
-      });
+      const data = await sendTransaction(signedXdr);
 
       /**
        * @Responses:
