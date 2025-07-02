@@ -320,7 +320,7 @@ export type GetEscrowsFromIndexerParams = {
    * Use this when you need to ensure the most up-to-date and accurate escrow information.
    * If you active this param, your request will take longer to complete.
    */
-  isValidOnChain?: boolean;
+  validateOnChain?: boolean;
 };
 
 export type GetEscrowsFromIndexerBySignerParams =
@@ -361,7 +361,7 @@ export type GetEscrowsFromIndexerByContractIdParams = {
    * Use this when you need to ensure the most up-to-date and accurate escrow information.
    * If you active this param, your request will take longer to complete.
    */
-  isValidOnChain?: boolean;
+  validateOnChain?: boolean;
 };
 
 // ----------------- Release Funds -----------------
