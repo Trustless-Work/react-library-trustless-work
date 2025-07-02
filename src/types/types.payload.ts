@@ -238,22 +238,6 @@ export type FundEscrowPayload = {
   signer: string;
 };
 
-// ----------------- Get Escrow -----------------
-/**
- * Get Escrow Params
- */
-export type GetEscrowParams = {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
-  contractId: string;
-
-  /**
-   * Address of the user signing the contract transaction
-   */
-  signer: string;
-};
-
 // ----------------- Get Escrows From Indexer -----------------
 /**
  * Get Escrows From Indexer Params
@@ -318,6 +302,11 @@ export type GetEscrowsFromIndexerParams = {
    * Type of the escrow. Filtering
    */
   type?: EscrowType;
+
+  /**
+   * If true, the escrows will be validated on the blockchain.
+   */
+  isValidOnChain?: boolean;
 };
 
 export type GetEscrowsFromIndexerBySignerParams =
@@ -338,6 +327,23 @@ export type GetEscrowsFromIndexerByRoleParams = GetEscrowsFromIndexerParams & {
    * Address of the owner of the escrows. If you want to get all escrows from a specific role, you can use this parameter. But with this parameter, you can't use the signer parameter.
    */
   roleAddress: string;
+};
+
+export type GetEscrowsFromIndexerByContractIdParams = {
+  /**
+   * ID (address) that identifies the escrow contract.
+   */
+  contractId: string;
+
+  /**
+   * Address of the user signing the contract transaction.
+   */
+  signer: string;
+
+  /**
+   * If true, the escrow will be validated on the blockchain.
+   */
+  isValidOnChain?: boolean;
 };
 
 // ----------------- Release Funds -----------------

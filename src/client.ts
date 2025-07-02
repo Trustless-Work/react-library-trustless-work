@@ -3,8 +3,6 @@ import {
   baseURL,
   InitializeMultiReleaseEscrowResponse,
   InitializeSingleReleaseEscrowResponse,
-  MultiReleaseEscrow,
-  SingleReleaseEscrow,
   UpdateMultiReleaseEscrowResponse,
   UpdateSingleReleaseEscrowResponse,
 } from "./types";
@@ -12,7 +10,6 @@ import {
   ChangeMilestoneStatusPayload,
   FundEscrowPayload,
   GetBalanceParams,
-  GetEscrowParams,
 } from "./types";
 import {
   EscrowRequestResponse,
@@ -24,6 +21,7 @@ import {
   ApproveMilestonePayload,
   GetEscrowsFromIndexerByRoleParams,
   GetEscrowsFromIndexerBySignerParams,
+  GetEscrowsFromIndexerByContractIdParams,
   InitializeMultiReleaseEscrowPayload,
   InitializeSingleReleaseEscrowPayload,
   MultiReleaseReleaseFundsPayload,
@@ -202,23 +200,6 @@ export class TrustlessWorkClient {
   }
 
   /**
-   * Get an escrow
-   * @param data - The data (GetEscrowParams) to get
-   * @param type - The type of escrow (single-release or multi-release) to get
-   * @returns The response from the API Escrow
-   */
-  getEscrow(data: GetEscrowParams, type: EscrowType) {
-    return this.axios
-      .get<SingleReleaseEscrow | MultiReleaseEscrow>(
-        `/escrow/${type}/get-escrow`,
-        {
-          params: data,
-        }
-      )
-      .then((r) => r.data);
-  }
-
-  /**
    * Get multiple balances
    * @param data - The data (GetBalanceParams) to get
    * @param type - The type of escrow (single-release or multi-release) to get
@@ -256,6 +237,21 @@ export class TrustlessWorkClient {
   getEscrowsFromIndexerByRole(data: GetEscrowsFromIndexerByRoleParams) {
     return this.axios
       .get<GetEscrowsFromIndexerResponse[]>(`/helper/get-escrows-by-role`, {
+        params: data,
+      })
+      .then((r) => r.data);
+  }
+
+  /**
+   * Get an escrow from the indexed by contractId
+   * @param data - The data (GetEscrowsFromIndexerByContractIdParams) to get
+   * @returns The response from the API GetEscrowsFromIndexerResponse
+   */
+  getEscrowsFromIndexerByContractId(
+    data: GetEscrowsFromIndexerByContractIdParams
+  ) {
+    return this.axios
+      .get<GetEscrowsFromIndexerResponse>(`/helper/get-escrow-by-contract-id`, {
         params: data,
       })
       .then((r) => r.data);
