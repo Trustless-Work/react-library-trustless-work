@@ -75,7 +75,12 @@ export type UpdateSingleReleaseEscrowPayload = {
   /**
    * Escrow data
    */
-  escrow: Omit<SingleReleaseEscrow, "contractId" | "signer" | "balance">;
+  escrow: Omit<SingleReleaseEscrow, "contractId" | "signer" | "balance"> & {
+    /**
+     * Whether the escrow is active. This comes from DB, not from the blockchain.
+     */
+    isActive?: boolean;
+  };
 
   /**
    * Address of the user signing the contract transaction
@@ -95,7 +100,12 @@ export type UpdateMultiReleaseEscrowPayload = {
   /**
    * Escrow data
    */
-  escrow: Omit<MultiReleaseEscrow, "contractId" | "signer" | "balance">;
+  escrow: Omit<MultiReleaseEscrow, "contractId" | "signer" | "balance"> & {
+    /**
+     * Whether the escrow is active. This comes from DB, not from the blockchain.
+     */
+    isActive?: boolean;
+  };
 
   /**
    * Address of the user signing the contract transaction
@@ -304,7 +314,11 @@ export type GetEscrowsFromIndexerParams = {
   type?: EscrowType;
 
   /**
-   * If true, the escrows will be validated on the blockchain.
+   * If true, the escrows will be validated on the blockchain to ensure data consistency.
+   * This performs an additional verification step to confirm that the escrow data
+   * returned from the indexer matches the current state on the blockchain.
+   * Use this when you need to ensure the most up-to-date and accurate escrow information.
+   * If you active this param, your request will take longer to complete.
    */
   isValidOnChain?: boolean;
 };
@@ -341,7 +355,11 @@ export type GetEscrowsFromIndexerByContractIdParams = {
   signer: string;
 
   /**
-   * If true, the escrow will be validated on the blockchain.
+   * If true, the escrows will be validated on the blockchain to ensure data consistency.
+   * This performs an additional verification step to confirm that the escrow data
+   * returned from the indexer matches the current state on the blockchain.
+   * Use this when you need to ensure the most up-to-date and accurate escrow information.
+   * If you active this param, your request will take longer to complete.
    */
   isValidOnChain?: boolean;
 };
