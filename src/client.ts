@@ -21,7 +21,6 @@ import {
   ApproveMilestonePayload,
   GetEscrowsFromIndexerByRoleParams,
   GetEscrowsFromIndexerBySignerParams,
-  GetEscrowsFromIndexerByContractIdParams,
   InitializeMultiReleaseEscrowPayload,
   InitializeSingleReleaseEscrowPayload,
   MultiReleaseReleaseFundsPayload,
@@ -32,6 +31,7 @@ import {
   SingleReleaseStartDisputePayload,
   UpdateMultiReleaseEscrowPayload,
   UpdateSingleReleaseEscrowPayload,
+  GetEscrowFromIndexerByContractIdParams,
 } from "./types/types.payload";
 import { GetEscrowsFromIndexerResponse } from "./types/types.response";
 
@@ -244,11 +244,11 @@ export class TrustlessWorkClient {
 
   /**
    * Get an escrow from the indexed by contractId
-   * @param data - The data (GetEscrowsFromIndexerByContractIdParams) to get
+   * @param data - The data (GetEscrowFromIndexerByContractIdParams) to get
    * @returns The response from the API GetEscrowsFromIndexerResponse
    */
-  getEscrowsFromIndexerByContractId(
-    data: GetEscrowsFromIndexerByContractIdParams
+  getEscrowFromIndexerByContractId(
+    data: GetEscrowFromIndexerByContractIdParams
   ) {
     return this.axios
       .get<GetEscrowsFromIndexerResponse>(`/helper/get-escrow-by-contract-id`, {

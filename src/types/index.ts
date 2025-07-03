@@ -48,4 +48,4 @@ export type { UpdateMultiReleaseEscrowPayload } from "./types.payload";
 export type { GetBalanceParams } from "./types.payload";
 export type { GetEscrowsFromIndexerBySignerParams } from "./types.payload";
 export type { GetEscrowsFromIndexerByRoleParams } from "./types.payload";
-export type { GetEscrowsFromIndexerByContractIdParams } from "./types.payload";
+export type { GetEscrowFromIndexerByContractIdParams } from "./types.payload";

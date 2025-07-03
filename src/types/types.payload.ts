@@ -343,7 +343,7 @@ export type GetEscrowsFromIndexerByRoleParams = GetEscrowsFromIndexerParams & {
   roleAddress: string;
 };
 
-export type GetEscrowsFromIndexerByContractIdParams = {
+export type GetEscrowFromIndexerByContractIdParams = {
   /**
    * ID (address) that identifies the escrow contract.
    */
