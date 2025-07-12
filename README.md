@@ -66,11 +66,10 @@ export function App() {
 3. Use the hooks in your components:
 
 ```tsx
-import { useInitializeEscrow, useGetEscrow } from '@trustless-work/escrow/hooks';
+import { useInitializeEscrow } from '@trustless-work/escrow/hooks';
 
 function YourComponent() {
   const { deployEscrow } = useInitializeEscrow();
-  const { getEscrow } = useGetEscrow();
 
   // Use the hooks...
 }
