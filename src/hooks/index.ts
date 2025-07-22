@@ -3,7 +3,7 @@
  */
 export { useInitializeEscrow } from "../hooks/useInitializeEscrow";
 export { useSendTransaction } from "../hooks/useSendTransaction";
-export { useGetEscrowFromIndexerByContractId } from "./useGetEscrowFromIndexerByContractId";
+export { useGetEscrowFromIndexerByContractIds } from "./useGetEscrowFromIndexerByContractIds";
 export { useUpdateEscrow } from "../hooks/useUpdateEscrow";
 export { useStartDispute } from "../hooks/useStartDispute";
 export { useResolveDispute } from "../hooks/useResolveDispute";
