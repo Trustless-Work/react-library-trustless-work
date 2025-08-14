@@ -32,8 +32,12 @@ import {
   UpdateMultiReleaseEscrowPayload,
   UpdateSingleReleaseEscrowPayload,
   GetEscrowFromIndexerByContractIdsParams,
+  UpdateFromTxHashPayload,
 } from "./types/types.payload";
-import { GetEscrowsFromIndexerResponse } from "./types/types.response";
+import {
+  GetEscrowsFromIndexerResponse,
+  UpdateFromTxHashResponse,
+} from "./types/types.response";
 
 export class TrustlessWorkClient {
   private axios: AxiosInstance;
@@ -257,6 +261,17 @@ export class TrustlessWorkClient {
           params: data,
         }
       )
+      .then((r) => r.data);
+  }
+
+  /**
+   * Update escrow data from a transaction hash
+   * @param payload - Object containing the transaction hash
+   * @returns UpdateFromTxHashResponse
+   */
+  updateFromTxHash(payload: UpdateFromTxHashPayload) {
+    return this.axios
+      .post<UpdateFromTxHashResponse>("/indexer/update-from-txHash", payload)
       .then((r) => r.data);
   }
 }

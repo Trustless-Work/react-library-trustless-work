@@ -406,3 +406,14 @@ export type GetBalanceParams = {
    */
   addresses: string[];
 };
+
+// ----------------- Update From Transaction Hash -----------------
+/**
+ * Payload for updating escrow data from a transaction hash.
+ */
+export type UpdateFromTxHashPayload = {
+  /**
+   * Transaction hash to be used for the update.
+   */
+  txHash: string;
+};
