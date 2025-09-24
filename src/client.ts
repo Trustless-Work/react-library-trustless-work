@@ -55,7 +55,7 @@ export class TrustlessWorkClient {
     this.axios.interceptors.request.clear();
     this.axios.interceptors.request.use((config) => {
       config.headers = config.headers ?? {};
-      config.headers["Authorization"] = `Bearer ${apiKey}`;
+      config.headers["x-api-key"] = apiKey;
       return config;
     });
   }
