@@ -1,10 +1,5 @@
 import { EscrowType, SingleReleaseEscrowStatus } from "./types";
-import {
-  MultiReleaseEscrow,
-  Role,
-  Roles,
-  SingleReleaseEscrow,
-} from "./types.entity";
+import { MultiReleaseEscrow, Role, SingleReleaseEscrow } from "./types.entity";
 
 /**
  * Documentation: https://docs.trustlesswork.com/trustless-work/developer-resources/quickstart/integration-demo-project/entities
@@ -206,14 +201,20 @@ export type SingleReleaseResolveDisputePayload = {
   disputeResolver: string;
 
   /**
-   * Amount of funds to be returned to the approver based on the global amount.
+   * Distributions of the escrow amount to the receivers.
    */
-  approverFunds: number;
-
-  /**
-   * Amount of funds to be returned to the receiver based on the global amount.
-   */
-  receiverFunds: number;
+  distributions: [
+    {
+      /**
+       * Address of the receiver
+       */
+      address: string;
+      /**
+       * Amount to be transferred to the receiver. All the amount must be equal to the total amount of the escrow.
+       */
+      amount: number;
+    },
+  ];
 };
 
 /**
