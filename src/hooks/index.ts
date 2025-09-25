@@ -7,6 +7,7 @@ export { useGetEscrowFromIndexerByContractIds } from "./useGetEscrowFromIndexerB
 export { useUpdateEscrow } from "../hooks/useUpdateEscrow";
 export { useStartDispute } from "../hooks/useStartDispute";
 export { useResolveDispute } from "../hooks/useResolveDispute";
+export { useWithdrawRemainingFunds } from "../hooks/useWithdrawRemainingFunds";
 export { useGetMultipleEscrowBalances } from "../hooks/useGetMultipleEscrowBalances";
 export { useReleaseFunds } from "../hooks/useReleaseFunds";
 export { useFundEscrow } from "../hooks/useFundEscrow";
