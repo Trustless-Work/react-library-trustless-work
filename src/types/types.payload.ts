@@ -151,11 +151,6 @@ export type ApproveMilestonePayload = Omit<
    * Address of the entity requiring the service.
    */
   approver: string;
-
-  /**
-   * New flag value of the milestone
-   */
-  newFlag: boolean;
 };
 
 // ----------------- Start Dispute -----------------
