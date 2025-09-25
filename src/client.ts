@@ -33,6 +33,7 @@ import {
   UpdateSingleReleaseEscrowPayload,
   GetEscrowFromIndexerByContractIdsParams,
   UpdateFromTxHashPayload,
+  WithdrawRemainingFundsPayload,
 } from "./types/types.payload";
 import {
   GetEscrowsFromIndexerResponse,
@@ -181,6 +182,20 @@ export class TrustlessWorkClient {
       type === "single-release"
         ? "resolve-dispute"
         : "resolve-milestone-dispute";
+    return this.axios
+      .post<EscrowRequestResponse>(`/escrow/${type}/${endpoint}`, data)
+      .then((r) => r.data);
+  }
+
+  /**
+   * Resolve a dispute
+   * @param data - The data (WithdrawRemainingFundsPayload) to resolve
+   * @returns The response from the API EscrowRequestResponse
+   */
+  withdrawRemainingFunds(data: WithdrawRemainingFundsPayload) {
+    const endpoint = "withdraw-remaining-funds";
+    const type = "multi-release";
+
     return this.axios
       .post<EscrowRequestResponse>(`/escrow/${type}/${endpoint}`, data)
       .then((r) => r.data);

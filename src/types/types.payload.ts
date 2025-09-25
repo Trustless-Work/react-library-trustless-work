@@ -228,6 +228,12 @@ export type MultiReleaseResolveDisputePayload =
     milestoneIndex: string;
   };
 
+// ----------------- Withdraw Remaining Funds -----------------
+/**
+ * Withdraw remaining funds
+ */
+export type WithdrawRemainingFundsPayload = SingleReleaseResolveDisputePayload;
+
 // ----------------- Fund Escrow -----------------
 /**
  * Fund Escrow Payload, this can be a single-release or multi-release
