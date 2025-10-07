@@ -352,11 +352,6 @@ export type GetEscrowFromIndexerByContractIdsParams = {
   contractIds: string[];
 
   /**
-   * Address of the user signing the contract transaction.
-   */
-  signer: string;
-
-  /**
    * If true, the escrows will be validated on the blockchain to ensure data consistency.
    * This performs an additional verification step to confirm that the escrow data
    * returned from the indexer matches the current state on the blockchain.
@@ -398,11 +393,6 @@ export type MultiReleaseReleaseFundsPayload =
  * Get Balance Params
  */
 export type GetBalanceParams = {
-  /**
-   * Address of the user signing the contract transaction
-   */
-  signer: string;
-
   /**
    * Addresses of the escrows to get the balance
    */
