@@ -113,7 +113,6 @@ export type GetEscrowsFromIndexerResponse = {
   milestones: SingleReleaseMilestone[] | MultiReleaseMilestone[];
   flags?: Flags;
   trustline: Trustline & { name: string };
-  receiverMemo?: number;
   isActive?: boolean;
   approverFunds?: string;
   receiverFunds?: string;

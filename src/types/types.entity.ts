@@ -111,11 +111,6 @@ export type SingleReleaseEscrow = {
    * Information on the trustline that will manage the movement of funds in escrow
    */
   trustline: Trustline;
-
-  /**
-   * Field used to identify the recipient's address in transactions through an intermediary account. This value is included as a memo in the transaction and allows the funds to be correctly routed to the wallet of the specified recipient
-   */
-  receiverMemo?: number;
 };
 
 /**
