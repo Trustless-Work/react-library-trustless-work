@@ -105,7 +105,7 @@ export type GetEscrowsFromIndexerResponse = {
   contractId?: string;
   engagementId: string;
   title: string;
-  roles: Roles;
+  roles: Roles | (Omit<Roles, "receiver">);
   description: string;
   amount: number;
   platformFee: number;
