@@ -38,6 +38,11 @@ export type MultiReleaseMilestone = BaseMilestone & {
   amount: number;
 
   /**
+   * Address where milestone proceeds will be sent to
+   */
+  receiver: string;
+
+  /**
    * Flags validating certain milestone life states, only if the escrow is multi-release
    */
   flags?: Flags;
@@ -118,9 +123,10 @@ export type SingleReleaseEscrow = {
  */
 export type MultiReleaseEscrow = Omit<
   SingleReleaseEscrow,
-  "milestones" | "flags" | "amount"
+  "milestones" | "flags" | "amount" | "roles"
 > & {
   milestones: MultiReleaseMilestone[];
+  roles: Omit<Roles, "receiver">;
 };
 
 /**
