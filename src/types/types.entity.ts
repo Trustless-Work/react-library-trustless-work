@@ -129,6 +129,11 @@ export type MultiReleaseEscrow = Omit<
  */
 export type Trustline = {
   /**
+   * Symbol of the token, example: USDC, EURC, etc...
+   */
+  symbol: string;
+
+  /**
    * Public address establishing permission to accept and use a specific token.
    */
   address: string;
