@@ -266,7 +266,7 @@ export class TrustlessWorkClient {
     data: GetEscrowFromIndexerByContractIdsParams
   ) {
     return this.axios
-      .get<GetEscrowsFromIndexerResponse>(
+      .get<GetEscrowsFromIndexerResponse[]>(
         `/helper/get-escrow-by-contract-ids`,
         {
           params: data,
