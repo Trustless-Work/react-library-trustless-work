@@ -105,14 +105,14 @@ export type GetEscrowsFromIndexerResponse = {
   contractId?: string;
   engagementId: string;
   title: string;
-  roles: Roles | (Omit<Roles, "receiver">);
+  roles: Roles | Omit<Roles, "receiver">;
   description: string;
   amount: number;
   platformFee: number;
   balance?: number;
   milestones: SingleReleaseMilestone[] | MultiReleaseMilestone[];
   flags?: Flags;
-  trustline: Trustline & { name: string };
+  trustline: Trustline;
   isActive?: boolean;
   approverFunds?: string;
   receiverFunds?: string;
