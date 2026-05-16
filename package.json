@@ -44,7 +44,7 @@
   "author": "Trustless Work",
   "license": "MIT",
   "type": "commonjs",
-  "description": "",
+  "description": "This SDK is a React/TypeScript client for Trustless Work.",
   "publishConfig": {
     "access": "public"
   },
