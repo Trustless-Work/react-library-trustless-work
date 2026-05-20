@@ -12,7 +12,7 @@ export { useGetMultipleEscrowBalances } from "../hooks/useGetMultipleEscrowBalan
 export { useReleaseFunds } from "../hooks/useReleaseFunds";
 export { useFundEscrow } from "../hooks/useFundEscrow";
 export { useChangeMilestoneStatus } from "../hooks/useChangeMilestoneStatus";
-export { useApproveMilestone } from "../hooks/useApproveMilestone";
+export { useApproveMilestones } from "../hooks/useApproveMilestones";
+export { useManageMilestones } from "../hooks/useManageMilestones";
 export { useGetEscrowsFromIndexerBySigner } from "../hooks/useGetEscrowsFromIndexerBySigner";
 export { useGetEscrowsFromIndexerByRole } from "../hooks/useGetEscrowsFromIndexerByRole";
-export { useUpdateFromTxHash } from "./useUpdateFromTxHash";

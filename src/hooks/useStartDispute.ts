@@ -6,8 +6,8 @@ import {
 import { EscrowType } from "../types/types";
 
 /**
- * Use the useStartDispute hook to start a dispute.
- * @returns A function to start a dispute.
+ * Start a dispute (v2). Single-release: whole escrow + `reason`.
+ * Multi-release: batch dispute milestones (`milestoneIndexes[]` + `reason`).
  */
 export function useStartDispute() {
   const client = useTrustlessWorkClient();
@@ -19,5 +19,9 @@ export function useStartDispute() {
         | MultiReleaseStartDisputePayload,
       type: EscrowType
     ) => client.startDispute(payload, type),
+
+    /** Multi-release only — batch dispute milestones. */
+    disputeMilestones: (payload: MultiReleaseStartDisputePayload) =>
+      client.disputeMilestones(payload),
   };
 }

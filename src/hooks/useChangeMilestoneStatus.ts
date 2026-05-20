@@ -2,8 +2,8 @@ import { useTrustlessWorkClient } from "../provider";
 import { ChangeMilestoneStatusPayload, EscrowType } from "../types";
 
 /**
- * Use the useChangeMilestoneStatus hook to change the status of a milestone.
- * @returns A function to change the status of a milestone.
+ * Batch change milestone status (v2). Works for single-release and multi-release.
+ * Payload: `{ contractId, serviceProvider, updates: [{ milestoneIndex, newStatus, newEvidence? }] }`.
  */
 export function useChangeMilestoneStatus() {
   const client = useTrustlessWorkClient();

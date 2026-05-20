@@ -6,8 +6,7 @@ import {
 import { EscrowType } from "../types/types";
 
 /**
- * Use the useReleaseFunds hook to release funds from an escrow.
- * @returns A function to release funds from an escrow.
+ * Release funds (v2). Single-release: whole escrow. Multi-release: batch via `milestoneIndexes[]`.
  */
 export function useReleaseFunds() {
   const client = useTrustlessWorkClient();
@@ -19,5 +18,9 @@ export function useReleaseFunds() {
         | MultiReleaseReleaseFundsPayload,
       type: EscrowType
     ) => client.releaseFunds(payload, type),
+
+    /** Multi-release only — batch release milestones (`milestoneIndexes[]`). */
+    releaseMilestones: (payload: MultiReleaseReleaseFundsPayload) =>
+      client.releaseMilestones(payload),
   };
 }
