@@ -1,118 +1,99 @@
-import { Date, EscrowType, Status } from "./types";
-import {
-  Flags,
-  MultiReleaseEscrow,
-  MultiReleaseMilestone,
-  Roles,
-  SingleReleaseEscrow,
-  SingleReleaseMilestone,
-  Trustline,
-} from "./types.entity";
+import { Date, EscrowType } from "./types";
+import { MultiReleaseEscrow, SingleReleaseEscrow } from "./types.entity";
 
 /**
- * Escrow's Response like fund, release, change, etc ...
+ * Build-step response for all escrow v2 operations (unsigned XDR).
  */
 export type EscrowRequestResponse = {
-  /**
-   * Status of the request
-   */
-  status: Status;
-
-  /**
-   * Unsigned transaction
-   */
-  unsignedTransaction?: string;
+  unsignedXdr: string;
+  txHash: string;
 };
 
 /**
- * Send Transaction Response
+ * Stable machine-readable codes from POST /stellar/submit-transaction.
+ */
+export type SubmitTransactionCode =
+  | "STELLAR_TX_SUBMITTED"
+  | "STELLAR_TX_SUBMITTED_INDEXER_LAGGING";
+
+/**
+ * Submit-step response after signing and posting a transaction.
  */
 export type SendTransactionResponse = {
-  /**
-   * Status of the request
-   */
-  status: Status;
-
-  /**
-   * Message of the request
-   */
-  message: string;
+  txHash: string;
+  ledger: number;
+  contractId?: string;
+  escrow?: SingleReleaseEscrow | MultiReleaseEscrow;
+  code?: SubmitTransactionCode;
+  message?: string;
 };
 
 /**
- * Initialize Escrow Response
- */
-export type InitializeSingleReleaseEscrowResponse = EscrowRequestResponse & {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
-  contractId: string;
-
-  /**
-   * Escrow data
-   */
-  escrow: SingleReleaseEscrow;
-
-  /**
-   * Message of the request
-   */
-  message: string;
-};
-
-/**
- * Initialize Multi Release Escrow Response
- */
-export type InitializeMultiReleaseEscrowResponse =
-  InitializeSingleReleaseEscrowResponse & {
-    /**
-     * Escrow data
-     */
-    escrow: MultiReleaseEscrow;
-  };
-
-/**
- * Update Escrow Response
- */
-export type UpdateSingleReleaseEscrowResponse =
-  InitializeSingleReleaseEscrowResponse;
-
-/**
- * Update Multi Release Escrow Response
- */
-export type UpdateMultiReleaseEscrowResponse =
-  InitializeMultiReleaseEscrowResponse;
-
-/**
- * Get Balances Response
+ * Get Balances Response (helper — unchanged)
  */
 export type GetEscrowBalancesResponse = {
-  /**
-   * Address of the escrow
-   */
   address: string;
-
-  /**
-   * Balance of the escrow
-   */
   balance: number;
 };
 
 /**
- * Get Escrows From Indexer Response
+ * Legacy v1-flavored roles returned by indexer helpers (unchanged endpoints).
+ */
+export type IndexerRoles = {
+  approver: string;
+  serviceProvider: string;
+  platformAddress: string;
+  releaseSigner: string;
+  disputeResolver: string;
+  receiver: string;
+};
+
+/**
+ * Legacy flags returned by indexer helpers.
+ */
+export type IndexerFlags = {
+  disputed?: boolean;
+  released?: boolean;
+  resolved?: boolean;
+  approved?: boolean;
+};
+
+/**
+ * Legacy v1-flavored milestone in indexer responses.
+ */
+export type IndexerSingleReleaseMilestone = {
+  description: string;
+  status?: string;
+  evidence?: string;
+  approved?: boolean;
+};
+
+export type IndexerMultiReleaseMilestone = IndexerSingleReleaseMilestone & {
+  amount: number;
+  receiver: string;
+  flags?: IndexerFlags;
+};
+
+/**
+ * Get Escrows From Indexer Response (helper — v1-flavored shape)
  */
 export type GetEscrowsFromIndexerResponse = {
   signer?: string;
   contractId?: string;
   engagementId: string;
   title: string;
-  roles: Roles | Omit<Roles, "receiver">;
+  roles: IndexerRoles | Omit<IndexerRoles, "receiver">;
   description: string;
   amount: number;
   platformFee: number;
   balance?: number;
-  milestones: SingleReleaseMilestone[] | MultiReleaseMilestone[];
-  flags?: Flags;
-  trustline: Trustline;
+  milestones: IndexerSingleReleaseMilestone[] | IndexerMultiReleaseMilestone[];
+  flags?: IndexerFlags;
+  trustline: {
+    symbol: string;
+    address: string;
+    contractId?: string;
+  };
   isActive?: boolean;
   approverFunds?: string;
   receiverFunds?: string;
@@ -120,19 +101,4 @@ export type GetEscrowsFromIndexerResponse = {
   createdAt: Date;
   updatedAt: Date;
   type: EscrowType;
-};
-
-/**
- * Response for updating escrow from transaction hash
- */
-export type UpdateFromTxHashResponse = {
-  /**
-   * Status of the request
-   */
-  status: "SUCCESS" | "FAILED";
-
-  /**
-   * Message describing the result
-   */
-  message: string;
 };

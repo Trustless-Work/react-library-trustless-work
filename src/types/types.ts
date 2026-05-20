@@ -1,24 +1,12 @@
 /**
  * The base URL for the Trustless Work API
  */
-export type baseURL =
-  | "https://api.trustlesswork.com"
-  | "https://dev.api.trustlesswork.com";
+export type baseURL = "https://trustless-core-production.up.railway.app";
 
 /**
  * Escrow Type
  */
 export type EscrowType = "single-release" | "multi-release";
-
-/**
- * Escrow Status
- */
-export type SingleReleaseEscrowStatus =
-  | "working"
-  | "pendingRelease"
-  | "released"
-  | "resolved"
-  | "inDispute";
 
 /**
  * Http Method

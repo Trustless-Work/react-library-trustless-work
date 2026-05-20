@@ -1,5 +1,25 @@
 /**
- * Milestone
+ * Milestone approvals (v2 on-chain shape)
+ */
+export type MilestoneApprovals = {
+  /**
+   * Number of distinct approvers required for the milestone.
+   */
+  target: number;
+
+  /**
+   * Distinct approvers that have already approved.
+   */
+  approvalCount: number;
+
+  /**
+   * Wallets that have approved this milestone.
+   */
+  approvers: string[];
+};
+
+/**
+ * Base milestone fields shared by single- and multi-release v2.
  */
 type BaseMilestone = {
   /**
@@ -8,7 +28,7 @@ type BaseMilestone = {
   description: string;
 
   /**
-   * Milestone status. Ex: Approved, In dispute, etc...
+   * Milestone status. Ex: pending, in_progress, completed, etc.
    */
   status?: string;
 
@@ -16,166 +36,110 @@ type BaseMilestone = {
    * Evidence of work performed by the service provider.
    */
   evidence?: string;
-};
 
-/**
- * Single Release Milestone
- */
-export type SingleReleaseMilestone = BaseMilestone & {
   /**
-   * Approved flag, only if the escrow is single-release
+   * Number of distinct approvers required (deploy-time). Defaults to 1 on-chain.
    */
-  approved?: boolean;
+  approvalsTarget?: number;
+
+  /**
+   * On-chain approval state (read responses).
+   */
+  approvals?: MilestoneApprovals;
 };
 
 /**
- * Multi Release Milestone
+ * Single Release Milestone (v2)
+ */
+export type SingleReleaseMilestone = BaseMilestone;
+
+/**
+ * Per-milestone dispute state (multi-release v2)
+ */
+export type MilestoneDispute = {
+  isDisputed: boolean;
+  reason: string;
+  resolved: boolean;
+};
+
+/**
+ * Multi Release Milestone (v2)
  */
 export type MultiReleaseMilestone = BaseMilestone & {
   /**
-   * Amount to be transferred upon completion of this milestone
+   * Amount allocated to this milestone in human-readable decimals.
    */
   amount: number;
 
   /**
-   * Address where milestone proceeds will be sent to
+   * Final beneficiary of this milestone's payout. Each milestone may pay a
+   * different address (multi-release v2 has no `roles.receiver`).
    */
   receiver: string;
 
   /**
-   * Flags validating certain milestone life states, only if the escrow is multi-release
+   * Per-milestone dispute state (read responses).
    */
-  flags?: Flags;
+  dispute?: MilestoneDispute;
+
+  /**
+   * True after this milestone's funds have been released.
+   */
+  released?: boolean;
 };
 
 /**
- * Single Release Escrow
+ * Escrow-level dispute (single-release v2)
  */
-export type SingleReleaseEscrow = {
+export type Dispute = {
+  isDisputed: boolean;
+  reason: string;
+  resolved: boolean;
+};
+
+/**
+ * Trustline (v2)
+ */
+export type Trustline = {
   /**
-   * Address of the user signing the contract transaction
+   * Issuer account address (G...) when resolved from symbol+address.
    */
-  signer: string;
+  address: string;
 
   /**
-   * ID (address) that identifies the escrow contract
+   * Soroban contract address of the asset (C...).
    */
   contractId: string;
 
   /**
-   * Unique identifier for the escrow
-   */
-  engagementId: string;
-
-  /**
-   * Name of the escrow
-   */
-  title: string;
-
-  /**
-   * Roles that make up the escrow structure
-   */
-  roles: Roles;
-
-  /**
-   * Text describing the function of the escrow
-   */
-  description: string;
-
-  /**
-   * Amount to be transferred upon completion of escrow milestones
-   */
-  amount: number;
-
-  /**
-   * Commission that the platform will receive when the escrow is completed
-   */
-  platformFee: number;
-
-  /**
-   * Amount of the token (XLM, USDC, EURC, etc) in the smart contract.
-   */
-  balance: number;
-
-  /**
-   * Objectives to be completed to define the escrow as completed
-   */
-  milestones: SingleReleaseMilestone[];
-
-  /**
-   * Flags validating certain escrow life states
-   */
-  flags?: Flags;
-
-  /**
-   * Information on the trustline that will manage the movement of funds in escrow
-   */
-  trustline: Trustline;
-};
-
-/**
- * Multi Release Escrow
- */
-export type MultiReleaseEscrow = Omit<
-  SingleReleaseEscrow,
-  "milestones" | "flags" | "amount" | "roles"
-> & {
-  milestones: MultiReleaseMilestone[];
-  roles: Omit<Roles, "receiver">;
-};
-
-/**
- * Trustline
- */
-export type Trustline = {
-  /**
-   * Symbol of the token, example: USDC, EURC, etc...
+   * Symbol of the token, example: USDC, EURC, etc.
    */
   symbol: string;
-
-  /**
-   * Public address establishing permission to accept and use a specific token.
-   */
-  address: string;
 };
 
 /**
- * Roles
+ * Roles (v2) — single-release. Operational roles are arrays (1–5 distinct
+ * addresses). `receiver` is escrow-level (one beneficiary for the full release).
  */
 export type Roles = {
-  /**
-   * Address of the entity requiring the service.
-   */
-  approver: string;
-
-  /**
-   * Address of the entity providing the service.
-   */
-  serviceProvider: string;
-
-  /**
-   * Address of the entity that owns the escrow
-   */
+  approvers: string[];
+  serviceProviders: string[];
   platformAddress: string;
-
-  /**
-   * Address of the user in charge of releasing the escrow funds to the service provider.
-   */
-  releaseSigner: string;
-
-  /**
-   * Address in charge of resolving disputes within the escrow.
-   */
-  disputeResolver: string;
-
-  /**
-   * Address where escrow proceeds will be sent to
-   */
+  releaseSigners: string[];
+  disputeResolvers: string[];
   receiver: string;
+  admin: string;
+  observers?: string[];
 };
 
 /**
- * Role
+ * Multi-release roles (v2) — same as `Roles` without `receiver`; each milestone
+ * defines its own receiver (see `MultiReleaseMilestone`).
+ */
+export type MultiReleaseRoles = Omit<Roles, "receiver">;
+
+/**
+ * Role filter for indexer queries (unchanged helper endpoints).
  */
 export type Role =
   | "approver"
@@ -184,29 +148,98 @@ export type Role =
   | "releaseSigner"
   | "disputeResolver"
   | "receiver"
+  | "admin"
+  | "observer"
   | "signer";
 
 /**
- * Flags
+ * Single Release Escrow (v2)
  */
-export type Flags = {
+export type SingleReleaseEscrow = {
   /**
-   * Flag indicating that an escrow is in dispute.
+   * Deployed escrow contract id (C...).
    */
-  disputed?: boolean;
+  contractId: string;
 
   /**
-   * Flag indicating that escrow funds have already been released.
+   * Factory / base contract id (C...).
+   */
+  contractBaseId?: string;
+
+  /**
+   * Address of the user signing the deploy transaction.
+   */
+  signer: string;
+
+  /**
+   * Unique identifier for the escrow.
+   */
+  engagementId: string;
+
+  /**
+   * Name of the escrow.
+   */
+  title: string;
+
+  /**
+   * Text describing the function of the escrow.
+   */
+  description: string;
+
+  /**
+   * Roles that make up the escrow structure.
+   */
+  roles: Roles;
+
+  /**
+   * Total escrow amount in human-readable decimals.
+   */
+  amount: number;
+
+  /**
+   * Commission that the platform will receive when the escrow is completed (percent).
+   */
+  platformFee: number;
+
+  /**
+   * Amount of the token in the smart contract (0 until funded).
+   */
+  balance: number;
+
+  /**
+   * Objectives to be completed to define the escrow as completed.
+   */
+  milestones: SingleReleaseMilestone[];
+
+  /**
+   * Escrow-level dispute state.
+   */
+  dispute?: Dispute;
+
+  /**
+   * True after release_funds succeeds.
    */
   released?: boolean;
 
   /**
-   * Flag indicating that a disputed escrow has already been resolved.
+   * Deploy transaction hash, if known.
    */
-  resolved?: boolean;
+  transactionHash?: string | null;
 
   /**
-   * Flag indicating whether a milestone has been approved by the approver.
+   * Information on the trustline that manages fund movement.
    */
-  approved?: boolean;
+  trustline: Trustline;
+};
+
+/**
+ * Multi Release Escrow (v2) — no top-level amount; each milestone carries amount
+ * and receiver.
+ */
+export type MultiReleaseEscrow = Omit<
+  SingleReleaseEscrow,
+  "amount" | "milestones" | "dispute" | "released" | "roles"
+> & {
+  roles: MultiReleaseRoles;
+  milestones: MultiReleaseMilestone[];
 };
