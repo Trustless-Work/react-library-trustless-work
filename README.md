@@ -161,7 +161,9 @@ const useEscrowStore = create((set, get) => ({
 
 ### Milestone Management
 - `useChangeMilestoneStatus`: Update milestone status
-- `useApproveMilestone`: Approve or reject milestones
+- `useApproveMilestones`: Approve one or more milestones (v2 batch)
+- `useManageMilestones`: Add or update milestones (v2)
+- `useWithdrawRemainingFunds`: Withdraw remaining funds after dispute
 
 ### Transaction Management
 - `useSendTransaction`: Send a transaction
@@ -237,14 +239,14 @@ export const useInitializeEscrowForm = () => {
        * - We need to pass the payload to the deployEscrow function
        * - The result will be an unsigned transaction
        */
-      const { unsignedTransaction } = await deployEscrow(
+      const { unsignedXdr } = await deployEscrow(
         payload,
         "single-release" // or "multi-release"
       );
 
-      if (!unsignedTransaction) {
+      if (!unsignedXdr) {
         throw new Error(
-          "Unsigned transaction is missing from deployEscrow response."
+          "Unsigned XDR is missing from deployEscrow response."
         );
       }
 
@@ -254,7 +256,7 @@ export const useInitializeEscrowForm = () => {
        * - The result will be a signed transaction
        */
       const signedXdr = await signTransaction({ /* This method should be provided by the wallet */
-        unsignedTransaction,
+        unsignedXdr,
         address: walletAddress || "",
       });
 
