@@ -1,43 +1,35 @@
 import axios, { AxiosInstance } from "axios";
+import { parseProblemDetails } from "./errors/parse-problem-details";
+import { TrustlessWorkApiError } from "./errors/trustless-work-api-error";
+import { baseURL, EscrowType } from "./types";
 import {
-  baseURL,
-  InitializeMultiReleaseEscrowResponse,
-  InitializeSingleReleaseEscrowResponse,
-  UpdateMultiReleaseEscrowResponse,
-  UpdateSingleReleaseEscrowResponse,
-} from "./types";
-import {
+  ApproveMilestonesPayload,
   ChangeMilestoneStatusPayload,
   FundEscrowPayload,
   GetBalanceParams,
-} from "./types";
-import {
-  EscrowRequestResponse,
-  GetEscrowBalancesResponse,
-  SendTransactionResponse,
-} from "./types";
-import { EscrowType } from "./types/types";
-import {
-  ApproveMilestonePayload,
+  GetEscrowFromIndexerByContractIdsParams,
   GetEscrowsFromIndexerByRoleParams,
   GetEscrowsFromIndexerBySignerParams,
   InitializeMultiReleaseEscrowPayload,
   InitializeSingleReleaseEscrowPayload,
+  ManageMultiReleaseMilestonesPayload,
+  ManageSingleReleaseMilestonesPayload,
   MultiReleaseReleaseFundsPayload,
   MultiReleaseResolveDisputePayload,
   MultiReleaseStartDisputePayload,
+  MultiReleaseWithdrawRemainingFundsPayload,
   SingleReleaseReleaseFundsPayload,
   SingleReleaseResolveDisputePayload,
   SingleReleaseStartDisputePayload,
+  SingleReleaseWithdrawRemainingFundsPayload,
   UpdateMultiReleaseEscrowPayload,
   UpdateSingleReleaseEscrowPayload,
-  GetEscrowFromIndexerByContractIdsParams,
-  UpdateFromTxHashPayload,
-  WithdrawRemainingFundsPayload,
 } from "./types/types.payload";
 import {
+  EscrowRequestResponse,
+  GetEscrowBalancesResponse,
   GetEscrowsFromIndexerResponse,
-  UpdateFromTxHashResponse,
+  SendTransactionResponse,
 } from "./types/types.response";
 
 export class TrustlessWorkClient {
@@ -45,12 +37,24 @@ export class TrustlessWorkClient {
 
   constructor(baseURL: baseURL, apiKey: string) {
     this.axios = axios.create({ baseURL });
+    this.axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const data = axios.isAxiosError(error)
+          ? error.response?.data
+          : undefined;
+        const problem = parseProblemDetails(data);
+        if (problem) {
+          return Promise.reject(new TrustlessWorkApiError(problem));
+        }
+        return Promise.reject(error);
+      },
+    );
     if (apiKey) this.setApiKey(apiKey);
   }
 
   /**
    * Set the API key for the client
-   * @param apiKey - The API key to set
    */
   setApiKey(apiKey: string) {
     this.axios.interceptors.request.clear();
@@ -61,167 +65,173 @@ export class TrustlessWorkClient {
     });
   }
 
+  private v2Base(type: EscrowType) {
+    return `/escrow/${type}/v2`;
+  }
+
   /**
-   * Send a transaction
-   * @param signedXdr - The signed XDR transaction string
-   * @returns The response from the API SendTransactionResponse | InitializeEscrowResponse | UpdateEscrowResponse
+   * Submit a signed transaction to the Stellar network.
    */
   sendTransaction(signedXdr: string) {
     return this.axios
-      .post<
-        | SendTransactionResponse
-        | InitializeSingleReleaseEscrowResponse
-        | InitializeMultiReleaseEscrowResponse
-        | UpdateSingleReleaseEscrowResponse
-        | UpdateMultiReleaseEscrowResponse
-      >("/helper/send-transaction", { signedXdr })
+      .post<SendTransactionResponse>("/stellar/submit-transaction", {
+        signedXdr,
+      })
       .then((r) => r.data);
   }
 
   /**
-   * Initialize an escrow
-   * @param data - The data (InitializeEscrowPayload, this can be a single-release or multi-release) to initialize
-   * @param type - The type of escrow (single-release or multi-release) to initialize
-   * @returns The response from the API EscrowRequestResponse, but you can set as InitializeEscrowResponse
+   * Build an unsigned deploy transaction for a new v2 escrow.
    */
   initializeEscrow(
     data:
       | InitializeSingleReleaseEscrowPayload
       | InitializeMultiReleaseEscrowPayload,
-    type: EscrowType
+    type: EscrowType,
   ) {
     return this.axios
-      .post<EscrowRequestResponse>(`/deployer/${type}`, data)
+      .post<EscrowRequestResponse>(`${this.v2Base(type)}/deploy`, data)
       .then((r) => r.data);
   }
 
   /**
-   * Update an escrow
-   * @param data - The data (UpdateEscrowPayload, this can be a single-release or multi-release) to update
-   * @param type - The type of escrow (single-release or multi-release) to update
-   * @returns The response from the API EscrowRequestResponse, but you can set as UpdateEscrowResponse
+   * Build an unsigned update transaction for a v2 escrow.
    */
   updateEscrow(
     data: UpdateSingleReleaseEscrowPayload | UpdateMultiReleaseEscrowPayload,
-    type: EscrowType
+    type: EscrowType,
   ) {
     return this.axios
-      .put<EscrowRequestResponse>(`/escrow/${type}/update-escrow`, data)
+      .put<EscrowRequestResponse>(`${this.v2Base(type)}/update`, data)
       .then((r) => r.data);
   }
 
   /**
-   * Change the status of a milestone
-   * @param data - The data (ChangeMilestoneStatusPayload, this can be a single-release or multi-release) to change
-   * @param type - The type of escrow (single-release or multi-release) to change
-   * @returns The response from the API EscrowRequestResponse
+   * Build an unsigned batch change-milestone-status transaction (single & multi).
+   * Body: `{ contractId, serviceProvider, updates[] }` — up to 50 milestones per call.
    */
   changeMilestoneStatus(data: ChangeMilestoneStatusPayload, type: EscrowType) {
     return this.axios
       .post<EscrowRequestResponse>(
-        `/escrow/${type}/change-milestone-status`,
-        data
+        `${this.v2Base(type)}/change-milestone-status`,
+        data,
       )
       .then((r) => r.data);
   }
 
   /**
-   * Approve a milestone
-   * @param data - The data (ApproveMilestonePayload) to approve
-   * @param type - The type of escrow (single-release or multi-release) to approve
-   * @returns The response from the API EscrowRequestResponse
+   * Build an unsigned batch approve-milestones transaction.
    */
-  approveMilestone(data: ApproveMilestonePayload, type: EscrowType) {
+  approveMilestones(data: ApproveMilestonesPayload, type: EscrowType) {
     return this.axios
-      .post<EscrowRequestResponse>(`/escrow/${type}/approve-milestone`, data)
+      .post<EscrowRequestResponse>(
+        `${this.v2Base(type)}/approve-milestones`,
+        data,
+      )
       .then((r) => r.data);
   }
 
   /**
-   * Fund an escrow
-   * @param data - The data (FundEscrowPayload) to fund
-   * @param type - The type of escrow (single-release or multi-release) to fund
-   * @returns The response from the API EscrowRequestResponse
+   * Build an unsigned manage-milestones transaction (add / update milestones).
+   */
+  manageMilestones(
+    data:
+      | ManageSingleReleaseMilestonesPayload
+      | ManageMultiReleaseMilestonesPayload,
+    type: EscrowType,
+  ) {
+    return this.axios
+      .post<EscrowRequestResponse>(
+        `${this.v2Base(type)}/manage-milestones`,
+        data,
+      )
+      .then((r) => r.data);
+  }
+
+  /**
+   * Build an unsigned fund transaction.
    */
   fundEscrow(data: FundEscrowPayload, type: EscrowType) {
     return this.axios
-      .post<EscrowRequestResponse>(`/escrow/${type}/fund-escrow`, data)
+      .post<EscrowRequestResponse>(`${this.v2Base(type)}/fund`, data)
       .then((r) => r.data);
   }
 
   /**
-   * Release funds from an escrow
-   * @param data - The data (ReleaseFundsPayload) to release
-   * @param type - The type of escrow (single-release or multi-release) to release
-   * @returns The response from the API EscrowRequestResponse
+   * Build an unsigned release-funds transaction.
+   * Single-release: releases the whole escrow. Multi-release: batch via `milestoneIndexes[]`.
    */
   releaseFunds(
     data: SingleReleaseReleaseFundsPayload | MultiReleaseReleaseFundsPayload,
-    type: EscrowType
+    type: EscrowType,
   ) {
-    const endpoint =
-      type === "single-release" ? "release-funds" : "release-milestone-funds";
     return this.axios
-      .post<EscrowRequestResponse>(`/escrow/${type}/${endpoint}`, data)
+      .post<EscrowRequestResponse>(`${this.v2Base(type)}/release-funds`, data)
       .then((r) => r.data);
   }
 
   /**
-   * Resolve a dispute
-   * @param data - The data (ResolveDisputePayload) to resolve
-   * @param type - The type of escrow (single-release or multi-release) to resolve
-   * @returns The response from the API EscrowRequestResponse
+   * Build an unsigned batch release-milestones transaction (multi-release only).
+   */
+  releaseMilestones(data: MultiReleaseReleaseFundsPayload) {
+    return this.releaseFunds(data, "multi-release");
+  }
+
+  /**
+   * Build an unsigned resolve-dispute transaction.
    */
   resolveDispute(
     data:
       | SingleReleaseResolveDisputePayload
       | MultiReleaseResolveDisputePayload,
-    type: EscrowType
+    type: EscrowType,
   ) {
-    const endpoint =
-      type === "single-release"
-        ? "resolve-dispute"
-        : "resolve-milestone-dispute";
     return this.axios
-      .post<EscrowRequestResponse>(`/escrow/${type}/${endpoint}`, data)
+      .post<EscrowRequestResponse>(`${this.v2Base(type)}/resolve-dispute`, data)
       .then((r) => r.data);
   }
 
   /**
-   * Resolve a dispute
-   * @param data - The data (WithdrawRemainingFundsPayload) to resolve
-   * @returns The response from the API EscrowRequestResponse
+   * Build an unsigned withdraw-remaining-funds transaction.
    */
-  withdrawRemainingFunds(data: WithdrawRemainingFundsPayload) {
-    const endpoint = "withdraw-remaining-funds";
-    const type = "multi-release";
-
+  withdrawRemainingFunds(
+    data:
+      | SingleReleaseWithdrawRemainingFundsPayload
+      | MultiReleaseWithdrawRemainingFundsPayload,
+    type: EscrowType,
+  ) {
     return this.axios
-      .post<EscrowRequestResponse>(`/escrow/${type}/${endpoint}`, data)
+      .post<EscrowRequestResponse>(
+        `${this.v2Base(type)}/withdraw-remaining-funds`,
+        data,
+      )
       .then((r) => r.data);
   }
 
   /**
-   * Start a dispute
-   * @param data - The data (StartDisputePayload) to start
-   * @param type - The type of escrow (single-release or multi-release) to start
-   * @returns The response from the API EscrowRequestResponse
+   * Build an unsigned dispute transaction.
+   * Single-release: `POST .../dispute` (whole escrow + `reason`).
+   * Multi-release: `POST .../dispute-milestones` (batch `milestoneIndexes[]` + `reason`).
    */
   startDispute(
     data: SingleReleaseStartDisputePayload | MultiReleaseStartDisputePayload,
-    type: EscrowType
+    type: EscrowType,
   ) {
-    const endpoint =
-      type === "single-release" ? "dispute-escrow" : "dispute-milestone";
+    const path = type === "single-release" ? "dispute" : "dispute-milestones";
     return this.axios
-      .post<EscrowRequestResponse>(`/escrow/${type}/${endpoint}`, data)
+      .post<EscrowRequestResponse>(`${this.v2Base(type)}/${path}`, data)
       .then((r) => r.data);
   }
 
   /**
-   * Get multiple balances
-   * @param data - The data (GetBalanceParams) to get
-   * @returns The response from the API GetEscrowBalancesResponse
+   * Build an unsigned batch dispute-milestones transaction (multi-release only).
+   */
+  disputeMilestones(data: MultiReleaseStartDisputePayload) {
+    return this.startDispute(data, "multi-release");
+  }
+
+  /**
+   * Get multiple balances (helper — unchanged)
    */
   getMultipleEscrowBalances(data: GetBalanceParams) {
     return this.axios
@@ -232,9 +242,7 @@ export class TrustlessWorkClient {
   }
 
   /**
-   * Get multiple escrows from the indexed by signer
-   * @param data - The data (GetEscrowsFromIndexerBySignerParams) to get
-   * @returns The response from the API GetEscrowsFromDBResponse
+   * Get escrows from the indexer by signer (helper — unchanged)
    */
   getEscrowsFromIndexerBySigner(data: GetEscrowsFromIndexerBySignerParams) {
     return this.axios
@@ -245,9 +253,7 @@ export class TrustlessWorkClient {
   }
 
   /**
-   * Get multiple escrows from the indexed by role
-   * @param data - The data (GetEscrowsFromIndexerByRoleParams) to get
-   * @returns The response from the API GetEscrowsFromIndexerResponse
+   * Get escrows from the indexer by role (helper — unchanged)
    */
   getEscrowsFromIndexerByRole(data: GetEscrowsFromIndexerByRoleParams) {
     return this.axios
@@ -258,31 +264,18 @@ export class TrustlessWorkClient {
   }
 
   /**
-   * Get multiple escrows from the indexed by contractIds
-   * @param data - The data (GetEscrowFromIndexerByContractIdsParams) to get
-   * @returns The response from the API GetEscrowsFromIndexerResponse
+   * Get escrows from the indexer by contract ids (helper — unchanged)
    */
   getEscrowFromIndexerByContractIds(
-    data: GetEscrowFromIndexerByContractIdsParams
+    data: GetEscrowFromIndexerByContractIdsParams,
   ) {
     return this.axios
       .get<GetEscrowsFromIndexerResponse[]>(
         `/helper/get-escrow-by-contract-ids`,
         {
           params: data,
-        }
+        },
       )
-      .then((r) => r.data);
-  }
-
-  /**
-   * Update escrow data from a transaction hash
-   * @param payload - Object containing the transaction hash
-   * @returns UpdateFromTxHashResponse
-   */
-  updateFromTxHash(payload: UpdateFromTxHashPayload) {
-    return this.axios
-      .post<UpdateFromTxHashResponse>("/indexer/update-from-txHash", payload)
       .then((r) => r.data);
   }
 }
