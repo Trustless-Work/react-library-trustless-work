@@ -18,10 +18,11 @@ import {
   MultiReleaseReleaseFundsPayload,
   MultiReleaseResolveDisputePayload,
   MultiReleaseStartDisputePayload,
+  MultiReleaseWithdrawRemainingFundsPayload,
   SingleReleaseReleaseFundsPayload,
   SingleReleaseResolveDisputePayload,
   SingleReleaseStartDisputePayload,
-  WithdrawRemainingFundsPayload,
+  SingleReleaseWithdrawRemainingFundsPayload,
   UpdateMultiReleaseEscrowPayload,
   UpdateSingleReleaseEscrowPayload,
 } from "./types/types.payload";
@@ -204,12 +205,17 @@ export class TrustlessWorkClient {
   }
 
   /**
-   * Multi-release only. Sweep leftover escrow balance after disputes.
+   * Build an unsigned withdraw-remaining-funds transaction.
    */
-  withdrawRemainingFunds(data: WithdrawRemainingFundsPayload) {
+  withdrawRemainingFunds(
+    data:
+      | SingleReleaseWithdrawRemainingFundsPayload
+      | MultiReleaseWithdrawRemainingFundsPayload,
+    type: EscrowType,
+  ) {
     return this.axios
       .post<EscrowRequestResponse>(
-        `${this.v2Base("multi-release")}/withdraw-remaining-funds`,
+        `${this.v2Base(type)}/withdraw-remaining-funds`,
         data,
       )
       .then((r) => r.data);

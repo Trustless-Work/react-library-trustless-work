@@ -38,7 +38,7 @@ Base: `escrow/single-release/v2`
 | Release funds | `POST` | `release-funds` | `releaseSigner`. TW address lo inyecta el API. |
 | Dispute | `POST` | `dispute` | + `reason` (hasta 500 chars). |
 | Resolve dispute | `POST` | `resolve-dispute` | `disputeResolver` + `distributions[]`. |
-| Withdraw remaining | `POST` | `withdraw-remaining-funds` | Existe en Core; **no expuesto en el SDK** (usar multi-release). |
+| Withdraw remaining | `POST` | `withdraw-remaining-funds` | `disputeResolver` + `distributions[]`. |
 
 ---
 
@@ -58,7 +58,7 @@ Base: `escrow/multi-release/v2`
 | Release funds | `POST` | `release-funds` | Batch `milestoneIndexes[]` + `releaseSigner`. |
 | Dispute | `POST` | `dispute-milestones` | Batch índices + `reason`. |
 | Resolve dispute | `POST` | `resolve-dispute` | Batch índices + `distributions`. |
-| Withdraw remaining | `POST` | `withdraw-remaining-funds` | **SDK: multi-release only** (Core también en single) |
+| Withdraw remaining | `POST` | `withdraw-remaining-funds` | |
 
 ---
 
@@ -119,7 +119,7 @@ Base: `escrow/multi-release/v2`
 
 - **Single:** `contractId`, `disputeResolver`, `distributions[]`.
 - **Multi resolve:** + `milestoneIndexes[]`.
-- **Withdraw (SDK: multi-release only):** `{ contractId, disputeResolver, distributions[] }`. Core también expone single-release; el SDK no.
+- **Withdraw:** misma familia de campos (single y multi en Core).
 
 ---
 
@@ -154,7 +154,7 @@ Base: `escrow/multi-release/v2`
 | `fundEscrow` | `POST .../fund-escrow` | `POST .../v2/fund` |
 | `releaseFunds` | multi: `release-milestone-funds` | `POST .../v2/release-funds` (+ TW; multi batch índices) |
 | `resolveDispute` | multi: `resolve-milestone-dispute` | `POST .../v2/resolve-dispute` |
-| `withdrawRemainingFunds` | — | `POST .../multi-release/v2/withdraw-remaining-funds` (multi only) |
+| `withdrawRemainingFunds` | multi `withdraw-remaining-funds` | `POST .../v2/withdraw-remaining-funds` (+ TW; single también) |
 | `startDispute` | `dispute-escrow` / `dispute-milestone` | `dispute` / `dispute-milestones` + `reason` |
 
 **Fuera de alcance (sin cambios en este doc):** `getEscrowsFromIndexerBySigner`, `getEscrowsFromIndexerByRole`, `getEscrowFromIndexerByContractIds`, `getMultipleEscrowBalances`.

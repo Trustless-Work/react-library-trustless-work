@@ -73,8 +73,7 @@ export type { SingleReleaseStartDisputePayload } from "./types.payload";
 export type { MultiReleaseStartDisputePayload } from "./types.payload";
 export type { SingleReleaseResolveDisputePayload } from "./types.payload";
 export type { MultiReleaseResolveDisputePayload } from "./types.payload";
-export type { WithdrawRemainingFundsPayload } from "./types.payload";
-/** @deprecated Use `WithdrawRemainingFundsPayload` */
+export type { SingleReleaseWithdrawRemainingFundsPayload } from "./types.payload";
 export type { MultiReleaseWithdrawRemainingFundsPayload } from "./types.payload";
 export type { FundEscrowPayload } from "./types.payload";
 export type { SingleReleaseReleaseFundsPayload } from "./types.payload";

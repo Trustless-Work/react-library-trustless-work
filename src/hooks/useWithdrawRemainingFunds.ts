@@ -1,15 +1,22 @@
 import { useTrustlessWorkClient } from "../provider";
-import { WithdrawRemainingFundsPayload } from "../types/types.payload";
+import {
+  MultiReleaseWithdrawRemainingFundsPayload,
+  SingleReleaseWithdrawRemainingFundsPayload,
+} from "../types/types.payload";
+import { EscrowType } from "../types/types";
 
 /**
- * Multi-release only. Withdraw remaining escrow balance after disputes.
- * Payload: `{ contractId, disputeResolver, distributions[] }`.
+ * Use the useWithdrawRemainingFunds hook to withdraw remaining funds (v2).
  */
 export function useWithdrawRemainingFunds() {
   const client = useTrustlessWorkClient();
 
   return {
-    withdrawRemainingFunds: (payload: WithdrawRemainingFundsPayload) =>
-      client.withdrawRemainingFunds(payload),
+    withdrawRemainingFunds: (
+      payload:
+        | SingleReleaseWithdrawRemainingFundsPayload
+        | MultiReleaseWithdrawRemainingFundsPayload,
+      type: EscrowType
+    ) => client.withdrawRemainingFunds(payload, type),
   };
 }

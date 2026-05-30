@@ -208,18 +208,14 @@ export type MultiReleaseResolveDisputePayload =
     milestoneIndexes: number[];
   };
 
-// ----------------- Withdraw Remaining Funds (multi-release only) -----------------
+// ----------------- Withdraw Remaining Funds -----------------
 
-/** Multi-release only — escrow-level sweep of leftover balance after disputes. */
-export type WithdrawRemainingFundsPayload = {
-  contractId: string;
-  disputeResolver: string;
-  distributions: Distribution[];
-};
+export type SingleReleaseWithdrawRemainingFundsPayload =
+  SingleReleaseResolveDisputePayload;
 
-/** @deprecated Use `WithdrawRemainingFundsPayload`. SDK does not expose single-release withdraw. */
+/** Withdraw remaining balance (multi-release). No milestoneIndexes — escrow-level sweep. */
 export type MultiReleaseWithdrawRemainingFundsPayload =
-  WithdrawRemainingFundsPayload;
+  SingleReleaseWithdrawRemainingFundsPayload;
 
 // ----------------- Fund Escrow -----------------
 
