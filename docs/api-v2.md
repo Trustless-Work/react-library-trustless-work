@@ -1,6 +1,6 @@
 # Trustless Work API v2 — referencia y migración del SDK React
 
-Este documento resume la API **HTTP v2 de operaciones escrow** expuesta por **Trustless-Work-Core** (`presentation/http/escrow/**/v2` y `stellar/submit-transaction`) y contrasta con el cliente actual en `react-library-trustless-work` (`src/client.ts` y tipos asociados).
+Este documento resume la API **HTTP v2 de operaciones escrow** expuesta por **Trustless-Work-Core** (`presentation/http/escrow/**/v2` y `stellar/send-transaction`) y el cliente en `react-library-trustless-work` (`src/client.ts` y tipos asociados).
 
 **Fuente de verdad:** código NestJS en `Trustless-Work-Core/src`. Swagger en `/docs`, OpenAPI en `/api`.
 
@@ -17,9 +17,9 @@ Los endpoints de escrow **no ejecutan** la transacción: devuelven un **XDR sin 
 | Paso | Método | Ruta | Cuerpo | Respuesta |
 |------|--------|------|--------|-----------|
 | Build | `POST` / `PUT` | `escrow/{single\|multi}-release/v2/{acción}` | DTO específico | `{ unsignedXdr, txHash }` |
-| Submit | `POST` | `stellar/submit-transaction` | `{ signedXdr }` | `txHash`, `ledger`, y opcionalmente `contractId`, `escrow`, `code`, `message` |
+| Submit | `POST` | `stellar/send-transaction` | `{ signedXdr }` | `txHash`, `ledger`, y opcionalmente `contractId`, `escrow`, `code`, `message` |
 
-**Cambio vs SDK:** `sendTransaction` hoy usa `POST /helper/send-transaction` → en Core es **`POST /stellar/submit-transaction`**. Las respuestas de build usan **`unsignedXdr`**, no `unsignedTransaction` + `status`.
+Las respuestas de build usan **`unsignedXdr`**, no `unsignedTransaction` + `status`.
 
 ---
 
@@ -31,14 +31,14 @@ Base: `escrow/single-release/v2`
 |--------|--------|------|--------|
 | Deploy | `POST` | `deploy` | Firma `signer`. |
 | Fund | `POST` | `fund` | No `fund-escrow`. |
-| Update | `PUT` | `update` | Firma `adminAddress`. |
+| Update | `PUT` | `update` | Firma `admin`. |
 | Change milestone status | `POST` | `change-milestone-status` | Batch `updates` (hasta 50). |
 | Approve milestones | `POST` | `approve-milestones` | Batch `milestoneIndexes[]`. |
 | Manage milestones | `POST` | `manage-milestones` | Admin; `newMilestones` + `milestoneUpdates`. |
 | Release funds | `POST` | `release-funds` | `releaseSigner`. TW address lo inyecta el API. |
 | Dispute | `POST` | `dispute` | + `reason` (hasta 500 chars). |
 | Resolve dispute | `POST` | `resolve-dispute` | `disputeResolver` + `distributions[]`. |
-| Withdraw remaining | `POST` | `withdraw-remaining-funds` | `disputeResolver` + `distributions[]`. |
+| Withdraw remaining | `POST` | `withdraw-remaining-funds` | Existe en Core; **no expuesto en el SDK** (usar multi-release). |
 
 ---
 
@@ -53,11 +53,12 @@ Base: `escrow/multi-release/v2`
 | Update | `PUT` | `update` | |
 | Change milestone status | `POST` | `change-milestone-status` | Batch `updates[]`. |
 | Approve milestones | `POST` | `approve-milestones` | Batch índices. |
+| Approve & release | `POST` | `approve-and-release-milestones` | **Multi-release only** (SDK). `signer` en approvers y releaseSigners; mismos índices para approve y release. |
 | Manage milestones | `POST` | `manage-milestones` | Updates pueden incluir `newAmount?`. |
 | Release funds | `POST` | `release-funds` | Batch `milestoneIndexes[]` + `releaseSigner`. |
 | Dispute | `POST` | `dispute-milestones` | Batch índices + `reason`. |
 | Resolve dispute | `POST` | `resolve-dispute` | Batch índices + `distributions`. |
-| Withdraw remaining | `POST` | `withdraw-remaining-funds` | |
+| Withdraw remaining | `POST` | `withdraw-remaining-funds` | **SDK: multi-release only** (Core también en single) |
 
 ---
 
@@ -70,17 +71,17 @@ Base: `escrow/multi-release/v2`
 
 ### 4.2 Roles v2
 
-- **Single:** arrays (1–5 direcciones, sin duplicados donde aplique): `approvers[]`, `serviceProviders[]`, `platformAddress`, `releaseSigners[]`, `disputeResolvers[]`, `receiver`, **`admin`**, `observers?`.
+- **Single:** arrays (1–5 direcciones, sin duplicados donde aplique): `approvers[]`, `serviceProviders[]`, `platform`, `releaseSigners[]`, `disputeResolvers[]`, `receiver`, **`admin`**, `observers?`.
 - **Multi:** lo mismo **sin** `receiver` (va por milestone).
 
 ### 4.3 Milestones
 
-- **Single:** `description`, `status?`, `evidence?`, `approvalsTarget?`.
+- **Single:** `description`, `status?`, `approvalsTarget` (requerido).
 - **Multi:** lo anterior + `amount` + `receiver`.
 
 ### 4.4 Update
 
-`contractId`, `adminAddress`, `escrow` (props completas; `milestones` requeridos por validador on-chain).
+`contractId`, `admin`, `escrow` (props completas; `milestones` requeridos por validador on-chain).
 
 ### 4.5 Fund
 
@@ -88,15 +89,19 @@ Base: `escrow/multi-release/v2`
 
 ### 4.6 Change milestone status
 
-`{ contractId, serviceProvider, updates: [{ milestoneIndex, newStatus, newEvidence? }] }` — índices **`number`**, no string.
+`{ contractId, serviceProvider, updates: [{ index, newStatus, newEvidence? }] }` — índices **`number`**, no string.
 
 ### 4.7 Approve milestones
 
 `{ contractId, approver, milestoneIndexes: number[] }`.
 
+### 4.7b Approve & release (multi-release only, SDK)
+
+`{ contractId, signer, milestoneIndexes: number[] }` — `signer` must be in both `roles.approvers` and `roles.releaseSigners`. Core also exposes this on single-release; the SDK does not.
+
 ### 4.8 Manage milestones
 
-`{ contractId, adminAddress, newMilestones[], milestoneUpdates[] }`.
+`{ contractId, admin, newMilestones[], milestoneUpdates: [{ index, newDescription?, newAmount? }] }`.
 
 ### 4.9 Release funds
 
@@ -114,7 +119,7 @@ Base: `escrow/multi-release/v2`
 
 - **Single:** `contractId`, `disputeResolver`, `distributions[]`.
 - **Multi resolve:** + `milestoneIndexes[]`.
-- **Withdraw:** misma familia de campos (single y multi en Core).
+- **Withdraw (SDK: multi-release only):** `{ contractId, disputeResolver, distributions[] }`. Core también expone single-release; el SDK no.
 
 ---
 
@@ -139,16 +144,17 @@ Base: `escrow/multi-release/v2`
 
 | Método SDK | Actual | v2 Core |
 |------------|--------|---------|
-| `sendTransaction` | `POST /helper/send-transaction` | `POST /stellar/submit-transaction` |
+| `sendTransaction` | `POST /stellar/send-transaction` | `POST /stellar/send-transaction` |
 | `initializeEscrow` | `POST /deployer/:type` | `POST /escrow/:type/v2/deploy` |
 | `updateEscrow` | `PUT /escrow/:type/update-escrow` | `PUT /escrow/:type/v2/update` |
 | `changeMilestoneStatus` | `POST .../change-milestone-status` | `POST .../v2/change-milestone-status` (batch) |
-| `approveMilestone` | `POST .../approve-milestone` | `POST .../v2/approve-milestones` |
-| *(nuevo)* | — | `POST .../v2/manage-milestones` |
+| `approveMilestones` | `POST .../approve-milestone` | `POST .../v2/approve-milestones` |
+| `approveAndReleaseMilestones` | — | `POST .../multi-release/v2/approve-and-release-milestones` (multi only) |
+| `manageMilestones` | — | `POST .../v2/manage-milestones` |
 | `fundEscrow` | `POST .../fund-escrow` | `POST .../v2/fund` |
 | `releaseFunds` | multi: `release-milestone-funds` | `POST .../v2/release-funds` (+ TW; multi batch índices) |
 | `resolveDispute` | multi: `resolve-milestone-dispute` | `POST .../v2/resolve-dispute` |
-| `withdrawRemainingFunds` | multi `withdraw-remaining-funds` | `POST .../v2/withdraw-remaining-funds` (+ TW; single también) |
+| `withdrawRemainingFunds` | — | `POST .../multi-release/v2/withdraw-remaining-funds` (multi only) |
 | `startDispute` | `dispute-escrow` / `dispute-milestone` | `dispute` / `dispute-milestones` + `reason` |
 
 **Fuera de alcance (sin cambios en este doc):** `getEscrowsFromIndexerBySigner`, `getEscrowsFromIndexerByRole`, `getEscrowFromIndexerByContractIds`, `getMultipleEscrowBalances`.
@@ -176,11 +182,12 @@ Archivos: `types.entity.ts`, `types.payload.ts`, `types.response.ts`, hooks de t
 |-----------|----------|----------------|---------------|
 | Change milestone status | `POST .../change-milestone-status` | `updates[]` (≤50) | `updates[]` (≤50) |
 | Approve milestones | `POST .../approve-milestones` | `milestoneIndexes[]` | `milestoneIndexes[]` |
+| Approve & release | `POST .../approve-and-release-milestones` | — (SDK no expone) | `signer` + `milestoneIndexes[]` |
 | Release funds | `POST .../release-funds` | escrow completo | `milestoneIndexes[]` |
 | Dispute | `POST .../dispute` o `.../dispute-milestones` | `reason` (escrow) | `milestoneIndexes[]` + `reason` |
 | Resolve dispute | `POST .../resolve-dispute` | `distributions[]` | `milestoneIndexes[]` + `distributions[]` |
 
-En el SDK: `changeMilestoneStatus` (batch en ambos), `approveMilestones`, `releaseFunds` / `releaseMilestones` (multi), `startDispute` / `disputeMilestones` (multi).
+En el SDK: `changeMilestoneStatus` (batch en ambos), `approveMilestones`, `approveAndReleaseMilestones` (multi only), `releaseFunds` / `releaseMilestones` (multi), `startDispute` / `disputeMilestones` (multi).
 
 ---
 
@@ -192,7 +199,7 @@ En el SDK: `changeMilestoneStatus` (batch en ambos), `approveMilestones`, `relea
 
 ## 10. Checklist (solo escrow ops)
 
-- [ ] Paths `escrow/{type}/v2/...` + `stellar/submit-transaction`.
+- [x] Paths `escrow/{type}/v2/...` + `stellar/send-transaction`.
 - [ ] Tipos roles / milestones / batch / TW address.
 - [ ] Hooks: initialize, update, fund, approve, change status, release, dispute, resolve, withdraw (+ manage si aplica).
 - [ ] **No modificar** hooks/métodos de get escrows del indexer.

@@ -12,6 +12,7 @@ export type { Roles } from "./types.entity";
 export type { MultiReleaseRoles } from "./types.entity";
 export type { Role } from "./types.entity";
 export type { Trustline } from "./types.entity";
+export type { DeployTrustline } from "./types.entity";
 
 /**
  * Error types (RFC 9457 Problem Details + escrow codes)
@@ -32,15 +33,11 @@ export type { EscrowErrorCode } from "./escrow-error-codes";
  */
 export type { EscrowRequestResponse } from "./types.response";
 export type { SendTransactionResponse } from "./types.response";
+export type { SendTransactionCode } from "./types.response";
+/** @deprecated Use `SendTransactionCode` */
 export type { SubmitTransactionCode } from "./types.response";
 export type { GetEscrowBalancesResponse } from "./types.response";
 export type { GetEscrowsFromIndexerResponse } from "./types.response";
-export type {
-  IndexerRoles,
-  IndexerFlags,
-  IndexerSingleReleaseMilestone,
-  IndexerMultiReleaseMilestone,
-} from "./types.response";
 
 /**
  * Core types
@@ -67,6 +64,7 @@ export type { ChangeMilestoneStatusBatchPayload } from "./types.payload";
 export type { ReleaseMilestonesPayload } from "./types.payload";
 export type { DisputeMilestonesPayload } from "./types.payload";
 export type { ApproveMilestonesPayload } from "./types.payload";
+export type { ApproveAndReleaseMilestonesPayload } from "./types.payload";
 export type { SingleReleaseMilestoneDescriptionUpdate } from "./types.payload";
 export type { MultiReleaseMilestoneDescriptionUpdate } from "./types.payload";
 export type { ManageSingleReleaseMilestonesPayload } from "./types.payload";
@@ -75,7 +73,8 @@ export type { SingleReleaseStartDisputePayload } from "./types.payload";
 export type { MultiReleaseStartDisputePayload } from "./types.payload";
 export type { SingleReleaseResolveDisputePayload } from "./types.payload";
 export type { MultiReleaseResolveDisputePayload } from "./types.payload";
-export type { SingleReleaseWithdrawRemainingFundsPayload } from "./types.payload";
+export type { WithdrawRemainingFundsPayload } from "./types.payload";
+/** @deprecated Use `WithdrawRemainingFundsPayload` */
 export type { MultiReleaseWithdrawRemainingFundsPayload } from "./types.payload";
 export type { FundEscrowPayload } from "./types.payload";
 export type { SingleReleaseReleaseFundsPayload } from "./types.payload";

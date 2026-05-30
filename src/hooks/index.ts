@@ -13,6 +13,7 @@ export { useReleaseFunds } from "../hooks/useReleaseFunds";
 export { useFundEscrow } from "../hooks/useFundEscrow";
 export { useChangeMilestoneStatus } from "../hooks/useChangeMilestoneStatus";
 export { useApproveMilestones } from "../hooks/useApproveMilestones";
+export { useApproveAndReleaseMilestones } from "../hooks/useApproveAndReleaseMilestones";
 export { useManageMilestones } from "../hooks/useManageMilestones";
 export { useGetEscrowsFromIndexerBySigner } from "../hooks/useGetEscrowsFromIndexerBySigner";
 export { useGetEscrowsFromIndexerByRole } from "../hooks/useGetEscrowsFromIndexerByRole";

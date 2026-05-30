@@ -3,7 +3,7 @@ import { ChangeMilestoneStatusPayload, EscrowType } from "../types";
 
 /**
  * Batch change milestone status (v2). Works for single-release and multi-release.
- * Payload: `{ contractId, serviceProvider, updates: [{ milestoneIndex, newStatus, newEvidence? }] }`.
+ * Payload: `{ contractId, serviceProvider, updates: [{ index, newStatus, newEvidence? }] }`.
  */
 export function useChangeMilestoneStatus() {
   const client = useTrustlessWorkClient();

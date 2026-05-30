@@ -1,4 +1,4 @@
-import { Date, EscrowType } from "./types";
+import { Date } from "./types";
 import { MultiReleaseEscrow, SingleReleaseEscrow } from "./types.entity";
 
 /**
@@ -10,11 +10,16 @@ export type EscrowRequestResponse = {
 };
 
 /**
- * Stable machine-readable codes from POST /stellar/submit-transaction.
+ * Stable machine-readable codes from POST /stellar/send-transaction.
  */
-export type SubmitTransactionCode =
+export type SendTransactionCode =
   | "STELLAR_TX_SUBMITTED"
   | "STELLAR_TX_SUBMITTED_INDEXER_LAGGING";
+
+/**
+ * @deprecated Use `SendTransactionCode` instead.
+ */
+export type SubmitTransactionCode = SendTransactionCode;
 
 /**
  * Submit-step response after signing and posting a transaction.
@@ -24,7 +29,7 @@ export type SendTransactionResponse = {
   ledger: number;
   contractId?: string;
   escrow?: SingleReleaseEscrow | MultiReleaseEscrow;
-  code?: SubmitTransactionCode;
+  code?: SendTransactionCode;
   message?: string;
 };
 
@@ -37,68 +42,20 @@ export type GetEscrowBalancesResponse = {
 };
 
 /**
- * Legacy v1-flavored roles returned by indexer helpers (unchanged endpoints).
+ * Indexer metadata appended to v2 escrow records from helper GET endpoints.
  */
-export type IndexerRoles = {
-  approver: string;
-  serviceProvider: string;
-  platformAddress: string;
-  releaseSigner: string;
-  disputeResolver: string;
-  receiver: string;
-};
-
-/**
- * Legacy flags returned by indexer helpers.
- */
-export type IndexerFlags = {
-  disputed?: boolean;
-  released?: boolean;
-  resolved?: boolean;
-  approved?: boolean;
-};
-
-/**
- * Legacy v1-flavored milestone in indexer responses.
- */
-export type IndexerSingleReleaseMilestone = {
-  description: string;
-  status?: string;
-  evidence?: string;
-  approved?: boolean;
-};
-
-export type IndexerMultiReleaseMilestone = IndexerSingleReleaseMilestone & {
-  amount: number;
-  receiver: string;
-  flags?: IndexerFlags;
-};
-
-/**
- * Get Escrows From Indexer Response (helper — v1-flavored shape)
- */
-export type GetEscrowsFromIndexerResponse = {
+type IndexerEscrowMetadata = {
   signer?: string;
-  contractId?: string;
-  engagementId: string;
-  title: string;
-  roles: IndexerRoles | Omit<IndexerRoles, "receiver">;
-  description: string;
-  amount: number;
-  platformFee: number;
-  balance?: number;
-  milestones: IndexerSingleReleaseMilestone[] | IndexerMultiReleaseMilestone[];
-  flags?: IndexerFlags;
-  trustline: {
-    symbol: string;
-    address: string;
-    contractId?: string;
-  };
   isActive?: boolean;
   approverFunds?: string;
   receiverFunds?: string;
   user: string;
   createdAt: Date;
   updatedAt: Date;
-  type: EscrowType;
 };
+
+/**
+ * Get Escrows From Indexer Response (helper — v2 escrow shape + metadata).
+ */
+export type GetEscrowsFromIndexerResponse = IndexerEscrowMetadata &
+  (SingleReleaseEscrow | MultiReleaseEscrow);

@@ -3,6 +3,7 @@ import { parseProblemDetails } from "./errors/parse-problem-details";
 import { TrustlessWorkApiError } from "./errors/trustless-work-api-error";
 import { baseURL, EscrowType } from "./types";
 import {
+  ApproveAndReleaseMilestonesPayload,
   ApproveMilestonesPayload,
   ChangeMilestoneStatusPayload,
   FundEscrowPayload,
@@ -17,11 +18,10 @@ import {
   MultiReleaseReleaseFundsPayload,
   MultiReleaseResolveDisputePayload,
   MultiReleaseStartDisputePayload,
-  MultiReleaseWithdrawRemainingFundsPayload,
   SingleReleaseReleaseFundsPayload,
   SingleReleaseResolveDisputePayload,
   SingleReleaseStartDisputePayload,
-  SingleReleaseWithdrawRemainingFundsPayload,
+  WithdrawRemainingFundsPayload,
   UpdateMultiReleaseEscrowPayload,
   UpdateSingleReleaseEscrowPayload,
 } from "./types/types.payload";
@@ -74,7 +74,7 @@ export class TrustlessWorkClient {
    */
   sendTransaction(signedXdr: string) {
     return this.axios
-      .post<SendTransactionResponse>("/stellar/submit-transaction", {
+      .post<SendTransactionResponse>("/stellar/send-transaction", {
         signedXdr,
       })
       .then((r) => r.data);
@@ -178,6 +178,18 @@ export class TrustlessWorkClient {
   }
 
   /**
+   * Multi-release only. Approve AND release the same milestone indexes atomically.
+   */
+  approveAndReleaseMilestones(data: ApproveAndReleaseMilestonesPayload) {
+    return this.axios
+      .post<EscrowRequestResponse>(
+        `${this.v2Base("multi-release")}/approve-and-release-milestones`,
+        data,
+      )
+      .then((r) => r.data);
+  }
+
+  /**
    * Build an unsigned resolve-dispute transaction.
    */
   resolveDispute(
@@ -192,17 +204,12 @@ export class TrustlessWorkClient {
   }
 
   /**
-   * Build an unsigned withdraw-remaining-funds transaction.
+   * Multi-release only. Sweep leftover escrow balance after disputes.
    */
-  withdrawRemainingFunds(
-    data:
-      | SingleReleaseWithdrawRemainingFundsPayload
-      | MultiReleaseWithdrawRemainingFundsPayload,
-    type: EscrowType,
-  ) {
+  withdrawRemainingFunds(data: WithdrawRemainingFundsPayload) {
     return this.axios
       .post<EscrowRequestResponse>(
-        `${this.v2Base(type)}/withdraw-remaining-funds`,
+        `${this.v2Base("multi-release")}/withdraw-remaining-funds`,
         data,
       )
       .then((r) => r.data);

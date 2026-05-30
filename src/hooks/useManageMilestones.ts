@@ -6,7 +6,8 @@ import {
 import { EscrowType } from "../types/types";
 
 /**
- * Use the useManageMilestones hook to add or update milestones (v2).
+ * Add or update milestones (v2).
+ * Payload: `{ contractId, admin, newMilestones[], milestoneUpdates: [{ index, ... }] }`.
  */
 export function useManageMilestones() {
   const client = useTrustlessWorkClient();

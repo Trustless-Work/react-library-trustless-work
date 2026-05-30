@@ -1,3 +1,5 @@
+import type { EscrowType } from "./types";
+
 /**
  * Milestone approvals (v2 on-chain shape)
  */
@@ -15,7 +17,7 @@ export type MilestoneApprovals = {
   /**
    * Wallets that have approved this milestone.
    */
-  approvers: string[];
+  approvedBy: string[];
 };
 
 /**
@@ -33,7 +35,7 @@ type BaseMilestone = {
   status?: string;
 
   /**
-   * Evidence of work performed by the service provider.
+   * Evidence of work performed by the service provider (read responses).
    */
   evidence?: string;
 
@@ -98,23 +100,21 @@ export type Dispute = {
 };
 
 /**
- * Trustline (v2)
+ * Trustline on deploy / send-transaction snapshot (address + symbol only).
  */
-export type Trustline = {
-  /**
-   * Issuer account address (G...) when resolved from symbol+address.
-   */
+export type DeployTrustline = {
   address: string;
+  symbol: string;
+};
 
+/**
+ * Trustline (v2 GET / full read)
+ */
+export type Trustline = DeployTrustline & {
   /**
    * Soroban contract address of the asset (C...).
    */
   contractId: string;
-
-  /**
-   * Symbol of the token, example: USDC, EURC, etc.
-   */
-  symbol: string;
 };
 
 /**
@@ -124,7 +124,7 @@ export type Trustline = {
 export type Roles = {
   approvers: string[];
   serviceProviders: string[];
-  platformAddress: string;
+  platform: string;
   releaseSigners: string[];
   disputeResolvers: string[];
   receiver: string;
@@ -139,12 +139,12 @@ export type Roles = {
 export type MultiReleaseRoles = Omit<Roles, "receiver">;
 
 /**
- * Role filter for indexer queries (unchanged helper endpoints).
+ * Role filter for indexer queries (helper endpoints).
  */
 export type Role =
   | "approver"
   | "serviceProvider"
-  | "platformAddress"
+  | "platform"
   | "releaseSigner"
   | "disputeResolver"
   | "receiver"
@@ -153,16 +153,21 @@ export type Role =
   | "signer";
 
 /**
- * Single Release Escrow (v2)
+ * Shared escrow fields (v2 read / deploy snapshot).
  */
-export type SingleReleaseEscrow = {
+type BaseEscrowFields = {
+  /**
+   * Contract family without version suffix.
+   */
+  type: EscrowType;
+
   /**
    * Deployed escrow contract id (C...).
    */
   contractId: string;
 
   /**
-   * Factory / base contract id (C...).
+   * Factory / base contract id (C...). Present on GET, omitted on deploy snapshot.
    */
   contractBaseId?: string;
 
@@ -187,16 +192,6 @@ export type SingleReleaseEscrow = {
   description: string;
 
   /**
-   * Roles that make up the escrow structure.
-   */
-  roles: Roles;
-
-  /**
-   * Total escrow amount in human-readable decimals.
-   */
-  amount: number;
-
-  /**
    * Commission that the platform will receive when the escrow is completed (percent).
    */
   platformFee: number;
@@ -205,6 +200,36 @@ export type SingleReleaseEscrow = {
    * Amount of the token in the smart contract (0 until funded).
    */
   balance: number;
+
+  /**
+   * Deploy transaction hash, if known.
+   */
+  transactionHash?: string | null;
+
+  /**
+   * Internal memo routing (GET only; omitted on deploy snapshot).
+   */
+  receiverMemo?: number;
+
+  /**
+   * Information on the trustline that manages fund movement.
+   */
+  trustline: Trustline | DeployTrustline;
+};
+
+/**
+ * Single Release Escrow (v2)
+ */
+export type SingleReleaseEscrow = BaseEscrowFields & {
+  /**
+   * Roles that make up the escrow structure.
+   */
+  roles: Roles;
+
+  /**
+   * Total escrow amount in human-readable decimals.
+   */
+  amount: number;
 
   /**
    * Objectives to be completed to define the escrow as completed.
@@ -220,16 +245,6 @@ export type SingleReleaseEscrow = {
    * True after release_funds succeeds.
    */
   released?: boolean;
-
-  /**
-   * Deploy transaction hash, if known.
-   */
-  transactionHash?: string | null;
-
-  /**
-   * Information on the trustline that manages fund movement.
-   */
-  trustline: Trustline;
 };
 
 /**
@@ -237,8 +252,8 @@ export type SingleReleaseEscrow = {
  * and receiver.
  */
 export type MultiReleaseEscrow = Omit<
-  SingleReleaseEscrow,
-  "amount" | "milestones" | "dispute" | "released" | "roles"
+  BaseEscrowFields,
+  "receiverMemo"
 > & {
   roles: MultiReleaseRoles;
   milestones: MultiReleaseMilestone[];

@@ -1,5 +1,6 @@
 import { EscrowType } from "./types";
 import {
+  DeployTrustline,
   MultiReleaseEscrow,
   MultiReleaseRoles,
   Role,
@@ -26,8 +27,7 @@ export type Distribution = {
 export type SingleReleaseMilestonePayload = {
   description: string;
   status?: string;
-  evidence?: string;
-  approvalsTarget?: number;
+  approvalsTarget: number;
 };
 
 /**
@@ -42,16 +42,34 @@ export type MultiReleaseMilestonePayload = SingleReleaseMilestonePayload & {
 
 export type InitializeSingleReleaseEscrowPayload = Omit<
   SingleReleaseEscrow,
-  "contractId" | "contractBaseId" | "balance" | "dispute" | "released" | "transactionHash" | "milestones"
+  | "type"
+  | "contractId"
+  | "contractBaseId"
+  | "balance"
+  | "dispute"
+  | "released"
+  | "transactionHash"
+  | "receiverMemo"
+  | "milestones"
+  | "trustline"
 > & {
   milestones: SingleReleaseMilestonePayload[];
+  trustline: DeployTrustline;
 };
 
 export type InitializeMultiReleaseEscrowPayload = Omit<
   MultiReleaseEscrow,
-  "contractId" | "contractBaseId" | "balance" | "transactionHash" | "milestones"
+  | "type"
+  | "contractId"
+  | "contractBaseId"
+  | "balance"
+  | "transactionHash"
+  | "receiverMemo"
+  | "milestones"
+  | "trustline"
 > & {
   milestones: MultiReleaseMilestonePayload[];
+  trustline: DeployTrustline;
 };
 
 // ----------------- Update Escrow -----------------
@@ -83,13 +101,13 @@ export type UpdateMultiReleaseEscrowProperties = Omit<
 
 export type UpdateSingleReleaseEscrowPayload = {
   contractId: string;
-  adminAddress: string;
+  admin: string;
   escrow: UpdateSingleReleaseEscrowProperties;
 };
 
 export type UpdateMultiReleaseEscrowPayload = {
   contractId: string;
-  adminAddress: string;
+  admin: string;
   escrow: UpdateMultiReleaseEscrowProperties;
 };
 
@@ -105,7 +123,7 @@ export type UpdateMultiReleaseEscrowPayload = {
 
 /** One entry in a change-milestone-status batch (single & multi). */
 export type MilestoneStatusUpdate = {
-  milestoneIndex: number;
+  index: number;
   newStatus: string;
   newEvidence?: string;
 };
@@ -128,6 +146,13 @@ export type ApproveMilestonesPayload = {
   milestoneIndexes: number[];
 };
 
+/** Multi-release only — atomic approve + release per milestone index. */
+export type ApproveAndReleaseMilestonesPayload = {
+  contractId: string;
+  signer: string;
+  milestoneIndexes: number[];
+};
+
 // ----------------- Manage Milestones -----------------
 
 export type SingleReleaseMilestoneDescriptionUpdate = {
@@ -142,14 +167,14 @@ export type MultiReleaseMilestoneDescriptionUpdate =
 
 export type ManageSingleReleaseMilestonesPayload = {
   contractId: string;
-  adminAddress: string;
+  admin: string;
   newMilestones: SingleReleaseMilestonePayload[];
   milestoneUpdates: SingleReleaseMilestoneDescriptionUpdate[];
 };
 
 export type ManageMultiReleaseMilestonesPayload = {
   contractId: string;
-  adminAddress: string;
+  admin: string;
   newMilestones: MultiReleaseMilestonePayload[];
   milestoneUpdates: MultiReleaseMilestoneDescriptionUpdate[];
 };
@@ -183,14 +208,18 @@ export type MultiReleaseResolveDisputePayload =
     milestoneIndexes: number[];
   };
 
-// ----------------- Withdraw Remaining Funds -----------------
+// ----------------- Withdraw Remaining Funds (multi-release only) -----------------
 
-export type SingleReleaseWithdrawRemainingFundsPayload =
-  SingleReleaseResolveDisputePayload;
+/** Multi-release only — escrow-level sweep of leftover balance after disputes. */
+export type WithdrawRemainingFundsPayload = {
+  contractId: string;
+  disputeResolver: string;
+  distributions: Distribution[];
+};
 
-/** Withdraw remaining balance (multi-release). No milestoneIndexes — escrow-level sweep. */
+/** @deprecated Use `WithdrawRemainingFundsPayload`. SDK does not expose single-release withdraw. */
 export type MultiReleaseWithdrawRemainingFundsPayload =
-  SingleReleaseWithdrawRemainingFundsPayload;
+  WithdrawRemainingFundsPayload;
 
 // ----------------- Fund Escrow -----------------
 
@@ -216,7 +245,7 @@ export type MultiReleaseReleaseFundsPayload =
 /** Alias for multi-release batch release. */
 export type ReleaseMilestonesPayload = MultiReleaseReleaseFundsPayload;
 
-// ----------------- Get Escrows From Indexer (unchanged) -----------------
+// ----------------- Get Escrows From Indexer (v2 shape) -----------------
 
 export type GetEscrowsFromIndexerParams = {
   page?: number;
