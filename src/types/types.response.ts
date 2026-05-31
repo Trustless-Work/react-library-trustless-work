@@ -55,7 +55,7 @@ type IndexerEscrowMetadata = {
 };
 
 /**
- * Get Escrows From Indexer Response (helper — v2 escrow shape + metadata).
+ * Get Escrow Response (helper — v2 escrow shape + metadata).
  */
-export type GetEscrowsFromIndexerResponse = IndexerEscrowMetadata &
+export type GetEscrowResponse = IndexerEscrowMetadata &
   (SingleReleaseEscrow | MultiReleaseEscrow);

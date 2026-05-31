@@ -29,7 +29,7 @@ import {
 import {
   EscrowRequestResponse,
   GetEscrowBalancesResponse,
-  GetEscrowsFromIndexerResponse,
+  GetEscrowResponse,
   SendTransactionResponse,
 } from "./types/types.response";
 
@@ -259,7 +259,7 @@ export class TrustlessWorkClient {
    */
   getEscrowsFromIndexerBySigner(data: GetEscrowsFromIndexerBySignerParams) {
     return this.axios
-      .get<GetEscrowsFromIndexerResponse[]>(`/helper/get-escrows-by-signer`, {
+      .get<GetEscrowResponse[]>(`/helper/get-escrows-by-signer`, {
         params: data,
       })
       .then((r) => r.data);
@@ -270,7 +270,7 @@ export class TrustlessWorkClient {
    */
   getEscrowsFromIndexerByRole(data: GetEscrowsFromIndexerByRoleParams) {
     return this.axios
-      .get<GetEscrowsFromIndexerResponse[]>(`/helper/get-escrows-by-role`, {
+      .get<GetEscrowResponse[]>(`/helper/get-escrows-by-role`, {
         params: data,
       })
       .then((r) => r.data);
@@ -283,12 +283,9 @@ export class TrustlessWorkClient {
     data: GetEscrowFromIndexerByContractIdsParams,
   ) {
     return this.axios
-      .get<GetEscrowsFromIndexerResponse[]>(
-        `/helper/get-escrow-by-contract-ids`,
-        {
-          params: data,
-        },
-      )
+      .get<GetEscrowResponse[]>(`/helper/get-escrow-by-contract-ids`, {
+        params: data,
+      })
       .then((r) => r.data);
   }
 }
