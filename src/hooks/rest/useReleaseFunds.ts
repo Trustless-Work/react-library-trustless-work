@@ -1,15 +1,15 @@
-import { useTrustlessWorkClient } from "../provider";
+import { useEscrowRest } from "../../provider";
 import {
   SingleReleaseReleaseFundsPayload,
   MultiReleaseReleaseFundsPayload,
-} from "../types/types.payload";
-import { EscrowType } from "../types/types";
+} from "../../types/types.payload";
+import { EscrowType } from "../../types/types";
 
 /**
  * Release funds (v2). Single-release: whole escrow. Multi-release: batch via `milestoneIndexes[]`.
  */
 export function useReleaseFunds() {
-  const client = useTrustlessWorkClient();
+  const rest = useEscrowRest();
 
   return {
     releaseFunds: (
@@ -17,10 +17,10 @@ export function useReleaseFunds() {
         | SingleReleaseReleaseFundsPayload
         | MultiReleaseReleaseFundsPayload,
       type: EscrowType
-    ) => client.releaseFunds(payload, type),
+    ) => rest.releaseFunds(payload, type),
 
     /** Multi-release only — batch release milestones (`milestoneIndexes[]`). */
     releaseMilestones: (payload: MultiReleaseReleaseFundsPayload) =>
-      client.releaseMilestones(payload),
+      rest.releaseMilestones(payload),
   };
 }

@@ -1,16 +1,16 @@
-import { useTrustlessWorkClient } from "../provider";
+import { useEscrowRest } from "../../provider";
 import {
   MultiReleaseResolveDisputePayload,
   SingleReleaseResolveDisputePayload,
-} from "../types/types.payload";
-import { EscrowType } from "../types/types";
+} from "../../types/types.payload";
+import { EscrowType } from "../../types/types";
 
 /**
  * Use the useResolveDispute hook to resolve a dispute.
  * @returns A function to resolve a dispute.
  */
 export function useResolveDispute() {
-  const client = useTrustlessWorkClient();
+  const rest = useEscrowRest();
 
   return {
     resolveDispute: (
@@ -18,6 +18,6 @@ export function useResolveDispute() {
         | SingleReleaseResolveDisputePayload
         | MultiReleaseResolveDisputePayload,
       type: EscrowType
-    ) => client.resolveDispute(payload, type),
+    ) => rest.resolveDispute(payload, type),
   };
 }

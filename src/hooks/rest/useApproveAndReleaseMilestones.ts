@@ -1,5 +1,5 @@
-import { useTrustlessWorkClient } from "../provider";
-import { ApproveAndReleaseMilestonesPayload } from "../types";
+import { useEscrowRest } from "../../provider";
+import { ApproveAndReleaseMilestonesPayload } from "../../types";
 
 /**
  * Multi-release only. Atomic approve + release for the given milestone indexes.
@@ -7,10 +7,10 @@ import { ApproveAndReleaseMilestonesPayload } from "../types";
  * `roles.approvers` and `roles.releaseSigners`.
  */
 export function useApproveAndReleaseMilestones() {
-  const client = useTrustlessWorkClient();
+  const rest = useEscrowRest();
 
   return {
     approveAndReleaseMilestones: (payload: ApproveAndReleaseMilestonesPayload) =>
-      client.approveAndReleaseMilestones(payload),
+      rest.approveAndReleaseMilestones(payload),
   };
 }

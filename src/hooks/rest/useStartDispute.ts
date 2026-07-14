@@ -1,16 +1,16 @@
-import { useTrustlessWorkClient } from "../provider";
+import { useEscrowRest } from "../../provider";
 import {
   MultiReleaseStartDisputePayload,
   SingleReleaseStartDisputePayload,
-} from "../types/types.payload";
-import { EscrowType } from "../types/types";
+} from "../../types/types.payload";
+import { EscrowType } from "../../types/types";
 
 /**
  * Start a dispute (v2). Single-release: whole escrow + `reason`.
  * Multi-release: batch dispute milestones (`milestoneIndexes[]` + `reason`).
  */
 export function useStartDispute() {
-  const client = useTrustlessWorkClient();
+  const rest = useEscrowRest();
 
   return {
     startDispute: (
@@ -18,10 +18,10 @@ export function useStartDispute() {
         | SingleReleaseStartDisputePayload
         | MultiReleaseStartDisputePayload,
       type: EscrowType
-    ) => client.startDispute(payload, type),
+    ) => rest.startDispute(payload, type),
 
     /** Multi-release only — batch dispute milestones. */
     disputeMilestones: (payload: MultiReleaseStartDisputePayload) =>
-      client.disputeMilestones(payload),
+      rest.disputeMilestones(payload),
   };
 }

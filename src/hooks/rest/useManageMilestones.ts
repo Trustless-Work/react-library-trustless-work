@@ -1,16 +1,16 @@
-import { useTrustlessWorkClient } from "../provider";
+import { useEscrowRest } from "../../provider";
 import {
   ManageMultiReleaseMilestonesPayload,
   ManageSingleReleaseMilestonesPayload,
-} from "../types/types.payload";
-import { EscrowType } from "../types/types";
+} from "../../types/types.payload";
+import { EscrowType } from "../../types/types";
 
 /**
  * Add or update milestones (v2).
  * Payload: `{ contractId, admin, newMilestones[], milestoneUpdates: [{ index, ... }] }`.
  */
 export function useManageMilestones() {
-  const client = useTrustlessWorkClient();
+  const rest = useEscrowRest();
 
   return {
     manageMilestones: (
@@ -18,6 +18,6 @@ export function useManageMilestones() {
         | ManageSingleReleaseMilestonesPayload
         | ManageMultiReleaseMilestonesPayload,
       type: EscrowType
-    ) => client.manageMilestones(payload, type),
+    ) => rest.manageMilestones(payload, type),
   };
 }

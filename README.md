@@ -2,7 +2,7 @@
 
 # Trustless Work <a href="https://www.npmjs.com/package/@trustless-work/escrow" target="_blank">React Library</a>
 
-A powerful React library for integrating Trustless Work's escrow and dispute resolution system into your applications. This library provides a set of React hooks and utilities to interact with the Trustless Work API.
+React/TypeScript client for Trustless Work Core **v2** escrows: build → sign → send, plus typed reads.
 
 ## Installation
 
@@ -10,35 +10,25 @@ A powerful React library for integrating Trustless Work's escrow and dispute res
 npm install @trustless-work/escrow
 # or
 yarn add @trustless-work/escrow
+# or
+pnpm add @trustless-work/escrow
 ```
 
 ## Quick Start
 
-1. Trustless Work React provides the TrustlessWorkConfig to provide all the custom hooks and entities to the whole project. To achieve this you'll need to create a Provider.
-
 ```tsx
-"use client"; // make sure this is a client component
+"use client";
 
-import React from "react";
 import {
-  // development environment = "https://dev.api.trustlesswork.com"
   development,
-
-  // mainnet environment = "https://api.trustlesswork.com"
-  mainNet,
   TrustlessWorkConfig,
 } from "@trustless-work/escrow";
 
-interface TrustlessWorkProviderProps {
-  children: React.ReactNode;
-}
-
 export function TrustlessWorkProvider({
   children,
-}: TrustlessWorkProviderProps) {
-  /**
-   * Get the API key from the environment variables
-   */
+}: {
+  children: React.ReactNode;
+}) {
   const apiKey = process.env.NEXT_PUBLIC_API_KEY || "";
 
   return (
@@ -49,295 +39,140 @@ export function TrustlessWorkProvider({
 }
 ```
 
-2. Wrap your app in the provider
+Optional wallet-session auth and default platform header:
 
 ```tsx
-import { TrustlessWorkProvider} from "@/trustless-work-provider.tsx";
- 
-export function App() {
-  return (
-    <TrustlessWorkProvider>
-      <YourApp />
-    </TrustlessWorkProvider>
-  );
-}
+<TrustlessWorkConfig
+  baseURL={development}
+  apiKey={apiKey}
+  getAccessToken={() => sessionToken}
+  defaultHeaders={{ "X-TW-Platform": platformId }}
+>
+  {children}
+</TrustlessWorkConfig>
 ```
 
-3. Use the hooks in your components:
+Non-React usage: import `TrustlessWorkClient` from `@trustless-work/escrow` — then use `client.rest` or `client.graphql`.
+
+## REST vs GraphQL
+
+| Surface | Import | Use for |
+|---------|--------|---------|
+| REST | `@trustless-work/escrow/rest` or `useEscrowRest()` | Deploy/fund/actions + `GET /escrows*` |
+| GraphQL | `@trustless-work/escrow/graphql` or `useEscrowGraphql()` | Escrow reads: `escrow` / `escrows` |
+
+Hooks also split: `@trustless-work/escrow/hooks/rest` and `@trustless-work/escrow/hooks/graphql`.
 
 ```tsx
-import { useInitializeEscrow } from '@trustless-work/escrow/hooks';
+import { useEscrowRest, useEscrowGraphql } from "@trustless-work/escrow";
+import { useGraphqlGetEscrow } from "@trustless-work/escrow/hooks/graphql";
 
-function YourComponent() {
-  const { deployEscrow } = useInitializeEscrow();
-
-  // Use the hooks...
-}
+const rest = useEscrowRest();
+const { getEscrow } = useGraphqlGetEscrow();
 ```
 
-## State Management Integration
-
-This library is designed to be flexible and work with any state management solution. The hooks expose functions that you can integrate with your preferred state management library.
-
-### With TanStack Query (Recommended)
+## Build → sign → send
 
 ```tsx
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TrustlessWorkConfig } from '@trustless-work/escrow';
+import {
+  useDeployEscrow,
+  useSendTransaction,
+} from "@trustless-work/escrow/hooks";
+import type { DeploySingleReleaseEscrowPayload } from "@trustless-work/escrow/types";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-    },
-  },
-});
+const { deployEscrow } = useDeployEscrow();
+const { sendTransaction } = useSendTransaction();
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TrustlessWorkConfig baseURL={development} apiKey={apiKey}>
-        <YourApp />
-      </TrustlessWorkConfig>
-    </QueryClientProvider>
+const onSubmit = async (payload: DeploySingleReleaseEscrowPayload) => {
+  const { unsignedXdr, contractId } = await deployEscrow(
+    payload,
+    "single-release",
+    // optional attribution:
+    // { platformId, subjectId }
   );
-}
 
-// Usage in components
-import { useQuery } from '@tanstack/react-query';
-import { useGetEscrowsFromIndexerByRole } from '@trustless-work/escrow/hooks';
-
-export const useEscrowsByRoleQuery = (params) => {
-  const { getEscrowsByRole } = useGetEscrowsFromIndexerByRole();
-
-  return useQuery({
-    queryKey: ["escrows", params.roleAddress, params.role],
-    queryFn: () => getEscrowsByRole(params),
-    enabled: !!params.roleAddress && !!params.role,
-    staleTime: 5 * 60 * 1000,
-  });
+  const signedXdr = await signWithWallet(unsignedXdr);
+  const result = await sendTransaction(signedXdr);
+  // result.txHash, result.ledger, result.contractId?, result.escrow?
 };
 ```
 
-### With Zustand
+## Reads (Core v2)
+
+### REST
+
+| Hook | API |
+|------|-----|
+| `useListEscrows` | `GET /escrows` |
+| `useGetEscrow` | `GET /escrows/:contractId` |
+| `useGetEscrowDetails` | `GET /escrows/details` |
+| `useListEscrowEvents` | `GET /escrows/:contractId/events` |
+| `useGetEscrowMilestones` | `GET /escrows/:contractId/milestones` |
+| `useGetEscrowsMilestones` | `GET /escrows/milestones` |
+| `useGetEscrowsFinancial` | `GET /escrows/financial` |
+
+### GraphQL
+
+| Hook | Query |
+|------|-------|
+| `useGraphqlGetEscrow` | `escrow(contractId)` |
+| `useGraphqlListEscrows` | `escrows(...)` |
 
 ```tsx
-import { create } from 'zustand';
-import { useGetEscrowsFromIndexerByRole } from '@trustless-work/escrow/hooks';
+import { useListEscrows, useGetEscrow } from "@trustless-work/escrow/hooks/rest";
+import { useQuery } from "@tanstack/react-query";
 
-const useEscrowStore = create((set, get) => ({
-  escrows: [],
-  isLoading: false,
-  error: null,
-  
-  fetchEscrows: async (params) => {
-    const { getEscrowsByRole } = useGetEscrowsFromIndexerByRole();
-    
-    set({ isLoading: true, error: null });
-    try {
-      const escrows = await getEscrowsByRole(params);
-      set({ escrows, isLoading: false });
-    } catch (error) {
-      set({ error, isLoading: false });
-    }
-  },
-}));
+const { listEscrows } = useListEscrows();
+const { getEscrow } = useGetEscrow();
+
+useQuery({
+  queryKey: ["escrows", "mine"],
+  queryFn: () => listEscrows({ scope: "mine", limit: 20 }),
+});
+
+useQuery({
+  queryKey: ["escrow", contractId],
+  queryFn: () => getEscrow(contractId),
+  enabled: !!contractId,
+});
 ```
 
-## Available Hooks
+List rows (REST) are `EscrowSummary` (`contractId`, `type`, `status`, full camelCased `snapshot`). There is no UUID `id` / `escrowId`.
 
-### Escrow Management
-- `useInitializeEscrow`: Create a new escrow
-- `useGetEscrow`: Fetch escrow details
-- `useGetMultipleEscrowBalances`: Get balances for multiple escrows
-- `useUpdateEscrow`: Update escrow information
-- `useFundEscrow`: Fund an escrow
-- `useReleaseFunds`: Release funds from escrow
+## Operate hooks
 
-### Dispute Resolution
-- `useStartDispute`: Initiate a dispute
-- `useResolveDispute`: Resolve an existing dispute
-
-### Milestone Management
-- `useChangeMilestoneStatus`: Update milestone status
-- `useApproveMilestones`: Approve one or more milestones (v2 batch)
-- `useManageMilestones`: Add or update milestones (v2)
-- `useWithdrawRemainingFunds`: Withdraw remaining funds after dispute
-
-### Transaction Management
-- `useSendTransaction`: Send a transaction
-
-### Data Fetching
-- `useGetEscrowsFromIndexerByRole`: Get escrows by role
-- `useGetEscrowsFromIndexerBySigner`: Get escrows by signer
+- `useDeployEscrow`
+- `useUpdateEscrow`, `useFundEscrow`, `useReleaseFunds`
+- `useStartDispute`, `useResolveDispute`, `useWithdrawRemainingFunds`
+- `useChangeMilestoneStatus`, `useApproveMilestones`, `useApproveAndReleaseMilestones`, `useManageMilestones`
+- `useSendTransaction`
 
 ## Types
 
-The library includes comprehensive TypeScript types for all operations. Key type definitions can be found in:
+Import from `@trustless-work/escrow/types`:
 
-- `types.entity.ts`: Core entity definitions
-- `types.payload.ts`: Request payload types
-- `types.response.ts`: API response types
+- **Operate:** `DeploySingleReleaseEscrowPayload`, `DeployEscrowResponse`, `BuildTransactionResponse`, …
+- **Reads:** `EscrowSummary`, `EscrowSnapshot`, `EscrowEvent`, `EscrowFinancial`, `ListEscrowsParams`, `ListEscrowsResponse`, …
 
-## Environment Setup
+## Environment
 
-The library supports two environments:
+`development` and `mainNet` currently point at:
 
-- Production: `https://api.trustlesswork.com`
-- Development: `https://dev.api.trustlesswork.com`
+`https://trustless-core-production.up.railway.app`
 
-Make sure to:
-1. Use the correct `baseURL` for your environment
-2. Store your API key in environment variables
-3. Use the appropriate API key for your environment
-4. You can get the API Key from the Trustless Work dApp. Make sure to use the correct API key for the environment you are using. We recommend saving this apiKey in your .env file.
-   * - "https://dapp.trustlesswork.com" (production)
-   * - "https://dapp.dev.trustlesswork.com" (development)
+You can pass any Core API `baseURL` string. Get an API key from the Trustless Work dApp.
 
-## Best Practices
+## Migrating from v4 → v5
 
-1. **State Management**: Choose the state management solution that best fits your project needs
-2. **Error Handling**: Implement proper error handling for all API calls
-3. **Loading States**: Use loading states to provide better user experience
-4. **Type Safety**: Take advantage of TypeScript types for better development experience
-5. **API Key Security**: Never expose your API key in client-side code. Use environment variables
-6. **Caching**: Implement appropriate caching strategies for better performance
+Breaking changes aligned with the Core v2 wire contract (2026-07-13):
 
-## Example Usage
-
-```tsx
-import {
-  useInitializeEscrow,
-  useSendTransaction,
-} from "@trustless-work/escrow/hooks";
-import {
-  InitializeEscrowPayload
-} from "@trustless-work/escrow/types";
-
-export const useInitializeEscrowForm = () => {
-
- /*
-  *  useInitializeEscrow
- */
- const { deployEscrow } = useInitializeEscrow();
- 
- /*
-  *  useSendTransaction
- */
- const { sendTransaction } = useSendTransaction();
-
-/*
- * onSubmit function, this could be called by form button
-*/
- const onSubmit = async (payload: InitializeEscrowPayload) => {
-
-    try {
-      /**
-       * API call by using the trustless work hooks
-       * @Note:
-       * - We need to pass the payload to the deployEscrow function
-       * - The result will be an unsigned transaction
-       */
-      const { unsignedXdr } = await deployEscrow(
-        payload,
-        "single-release" // or "multi-release"
-      );
-
-      if (!unsignedXdr) {
-        throw new Error(
-          "Unsigned XDR is missing from deployEscrow response."
-        );
-      }
-
-      /**
-       * @Note:
-       * - We need to sign the transaction using your [private key] such as wallet
-       * - The result will be a signed transaction
-       */
-      const signedXdr = await signTransaction({ /* This method should be provided by the wallet */
-        unsignedXdr,
-        address: walletAddress || "",
-      });
-
-      if (!signedXdr) {
-        throw new Error("Signed transaction is missing.");
-      }
-
-      /**
-       * @Note:
-       * - We need to send the signed transaction to the API
-       * - The data will be an SendTransactionResponse
-       */
-      const data = await sendTransaction(signedXdr);
-
-      /**
-       * @Responses:
-       * data.status === "SUCCESS"
-       * - Escrow updated successfully
-       * - Show a success toast
-       *
-       * data.status == "ERROR"
-       * - Show an error toast
-       */
-      if (data.status === "SUCCESS") {
-        toast.success("Escrow Created");
-      }
-    } catch (error: unknown) {
-      // catch error logic
-    }
-  };
-}
-
-```
-
-## Contributing
-
-We welcome contributions! Please read our contributing guidelines before submitting pull requests.
+1. **Removed** legacy helpers: `/helper/get-escrows-by-*`, `/helper/get-escrow-by-contract-ids`, `/helper/get-multiple-escrow-balance` and their hooks.
+2. **Use** `useListEscrows` / `useGetEscrow` / `useGetEscrowDetails` / financial & milestones hooks instead.
+3. Escrow identity is **`contractId` only** (no UUID).
+4. Deploy response includes **`contractId`**: `{ unsignedXdr, txHash, contractId }`.
+5. Deploy trustline is `{ contractId, symbol }` (Soroban SAC `C…` + asset code).
+6. Use `useDeployEscrow` + `Deploy*EscrowPayload` (no `Initialize*` aliases).
 
 ## License
 
-MIT License - see LICENSE file for details
-
-# Maintainers | [Telegram](https://t.me/+kmr8tGegxLU0NTA5)
-
-<table align="center">
-  <tr>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/6b97e15f-9954-47d0-81b5-49f83bed5e4b" alt="Owner 1" width="150" />
-      <br /><br />
-      <strong>Tech Rebel | Product Manager</strong>
-      <br /><br />
-      <a href="https://github.com/techrebelgit" target="_blank">techrebelgit</a>
-      <br />
-      <a href="https://t.me/Tech_Rebel" target="_blank">Telegram</a>
-    </td>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/e245e8af-6f6f-4a0a-a37f-df132e9b4986" alt="Owner 2" width="150" />
-      <br /><br />
-      <strong>Joel Vargas | Frontend Developer</strong>
-      <br /><br />
-      <a href="https://github.com/JoelVR17" target="_blank">JoelVR17</a>
-      <br />
-      <a href="https://t.me/joelvr20" target="_blank">Telegram</a>
-    </td>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/53d65ea1-007e-40aa-b9b5-e7a10d7bea84" alt="Owner 3" width="150" />
-      <br /><br />
-      <strong>Armando Murillo | Full Stack Developer</strong>
-      <br /><br />
-      <a href="https://github.com/armandocodecr" target="_blank">armandocodecr</a>
-      <br />
-      <a href="https://t.me/armandocode" target="_blank">Telegram</a>
-    </td>
-    <td align="center">
-      <img src="https://github.com/user-attachments/assets/851273f6-2f91-413d-bd2d-d8dc1f3c2d28" alt="Owner 4" width="150" />
-      <br /><br />
-      <strong>Caleb Loría | Smart Contract Developer</strong>
-      <br /><br />
-      <a href="https://github.com/zkCaleb-dev" target="_blank">zkCaleb-dev</a>
-      <br />
-      <a href="https://t.me/zkCaleb_dev" target="_blank">Telegram</a>
-    </td>
-  </tr>
-</table>
+MIT License — see LICENSE file for details.

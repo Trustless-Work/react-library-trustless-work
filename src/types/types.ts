@@ -1,27 +1,19 @@
 /**
- * The base URL for the Trustless Work API
+ * Base URL for the Trustless Work Core API.
  */
-export type baseURL = "https://trustless-core-production.up.railway.app";
+export type baseURL = string;
 
 /**
- * Escrow Type
+ * Escrow contract family.
  */
 export type EscrowType = "single-release" | "multi-release";
 
 /**
- * Http Method
+ * Derived on-chain escrow status (read-model).
  */
-export type HttpMethod = "get" | "post" | "put" | "delete";
+export type EscrowStatus = "active" | "released" | "disputed";
 
 /**
- * Unique possible statuses for a Trustless Work request
+ * Network identifier returned by the Core API.
  */
-export type Status = "SUCCESS" | "FAILED";
-
-/**
- * Date
- */
-export type Date = {
-  _seconds: number;
-  _nanoseconds: number;
-};
+export type EscrowNetwork = string;

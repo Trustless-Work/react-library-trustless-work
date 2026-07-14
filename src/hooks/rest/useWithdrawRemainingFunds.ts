@@ -1,15 +1,15 @@
-import { useTrustlessWorkClient } from "../provider";
+import { useEscrowRest } from "../../provider";
 import {
   MultiReleaseWithdrawRemainingFundsPayload,
   SingleReleaseWithdrawRemainingFundsPayload,
-} from "../types/types.payload";
-import { EscrowType } from "../types/types";
+} from "../../types/types.payload";
+import { EscrowType } from "../../types/types";
 
 /**
  * Use the useWithdrawRemainingFunds hook to withdraw remaining funds (v2).
  */
 export function useWithdrawRemainingFunds() {
-  const client = useTrustlessWorkClient();
+  const rest = useEscrowRest();
 
   return {
     withdrawRemainingFunds: (
@@ -17,6 +17,6 @@ export function useWithdrawRemainingFunds() {
         | SingleReleaseWithdrawRemainingFundsPayload
         | MultiReleaseWithdrawRemainingFundsPayload,
       type: EscrowType
-    ) => client.withdrawRemainingFunds(payload, type),
+    ) => rest.withdrawRemainingFunds(payload, type),
   };
 }

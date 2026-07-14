@@ -1,15 +1,15 @@
-import { useTrustlessWorkClient } from "../provider";
-import { EscrowType, FundEscrowPayload } from "../types";
+import { useEscrowRest } from "../../provider";
+import { EscrowType, FundEscrowPayload } from "../../types";
 
 /**
  * Use the useFundEscrow hook to fund an escrow.
  * @returns A function to fund an escrow.
  */
 export function useFundEscrow() {
-  const client = useTrustlessWorkClient();
+  const rest = useEscrowRest();
 
   return {
     fundEscrow: (payload: FundEscrowPayload, type: EscrowType) =>
-      client.fundEscrow(payload, type),
+      rest.fundEscrow(payload, type),
   };
 }
