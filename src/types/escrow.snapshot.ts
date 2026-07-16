@@ -16,9 +16,17 @@ type BaseEscrowSnapshot = {
   description: string;
   engagementId: string;
   trustline: Trustline;
-  platformFee: number;
-  receiverMemo?: number;
+  /** Human token units as decimal string on the read-model. */
+  platformFee: string;
   flags?: Record<string, unknown>;
+};
+
+/** Milestone row embedded in read-model snapshots (amounts as decimal strings). */
+export type SnapshotMultiReleaseMilestone = Omit<
+  MultiReleaseMilestone,
+  "amount"
+> & {
+  amount: string;
 };
 
 /**
@@ -26,7 +34,7 @@ type BaseEscrowSnapshot = {
  */
 export type SingleReleaseEscrowSnapshot = BaseEscrowSnapshot & {
   roles: Roles;
-  amount: number;
+  amount: string;
   milestones: SingleReleaseMilestone[];
   dispute?: Dispute;
   released?: boolean;
@@ -37,7 +45,7 @@ export type SingleReleaseEscrowSnapshot = BaseEscrowSnapshot & {
  */
 export type MultiReleaseEscrowSnapshot = BaseEscrowSnapshot & {
   roles: MultiReleaseRoles;
-  milestones: MultiReleaseMilestone[];
+  milestones: SnapshotMultiReleaseMilestone[];
 };
 
 /**

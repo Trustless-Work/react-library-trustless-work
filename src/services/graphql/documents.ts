@@ -10,6 +10,12 @@ const ESCROW_CORE_FIELDS = `
   engagementId
   status
   totalAmount
+  balance
+  asset {
+    name
+    address
+    contractId
+  }
   lastLedgerSeq
   createdAt
   updatedAt

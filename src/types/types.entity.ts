@@ -118,7 +118,6 @@ type BaseEscrowFields = {
   platformFee: number;
   balance: number;
   transactionHash?: string | null;
-  receiverMemo?: number;
   trustline: Trustline;
 };
 
@@ -136,7 +135,7 @@ export type SingleReleaseEscrow = BaseEscrowFields & {
 /**
  * Multi-release escrow on-chain shape (snapshot / send-transaction).
  */
-export type MultiReleaseEscrow = Omit<BaseEscrowFields, "receiverMemo"> & {
+export type MultiReleaseEscrow = BaseEscrowFields & {
   roles: MultiReleaseRoles;
   milestones: MultiReleaseMilestone[];
 };

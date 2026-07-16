@@ -23,6 +23,7 @@ export type {
   EscrowSnapshotFor,
   SingleReleaseEscrowSnapshot,
   MultiReleaseEscrowSnapshot,
+  SnapshotMultiReleaseMilestone,
 } from "./escrow.snapshot";
 
 /**
@@ -30,6 +31,7 @@ export type {
  */
 export type {
   EscrowSummary,
+  EscrowAsset,
   EscrowEvent,
   EscrowDeposit,
   EscrowFinancial,

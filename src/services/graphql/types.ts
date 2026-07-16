@@ -1,4 +1,5 @@
 import type { EscrowStatus, EscrowType } from "../../types";
+import type { EscrowAsset } from "../../types/escrow.read";
 import type { EscrowSnapshot } from "../../types/escrow.snapshot";
 import type { Role } from "../../types/types.entity";
 
@@ -65,6 +66,8 @@ export type GraphqlEscrow = {
   engagementId: string | null;
   status: EscrowStatus | string | null;
   totalAmount: string | null;
+  balance: string;
+  asset: EscrowAsset | null;
   lastLedgerSeq: string;
   createdAt: string;
   updatedAt: string;

@@ -137,7 +137,9 @@ useQuery({
 });
 ```
 
-List rows (REST) are `EscrowSummary` (`contractId`, `type`, `status`, full camelCased `snapshot`). There is no UUID `id` / `escrowId`.
+List rows (REST) are `EscrowSummary` (`contractId`, `type`, `status`, `balance`, `asset`, full camelCased `snapshot`). There is no UUID `id` / `escrowId`.
+
+Read-model amounts are **human decimal strings** (e.g. `"250.5"`). Do not divide by `1e7` on the client. Build/operate payloads still use human **numbers**.
 
 ## Operate hooks
 
@@ -152,7 +154,7 @@ List rows (REST) are `EscrowSummary` (`contractId`, `type`, `status`, full camel
 Import from `@trustless-work/escrow/types`:
 
 - **Operate:** `DeploySingleReleaseEscrowPayload`, `DeployEscrowResponse`, `BuildTransactionResponse`, …
-- **Reads:** `EscrowSummary`, `EscrowSnapshot`, `EscrowEvent`, `EscrowFinancial`, `ListEscrowsParams`, `ListEscrowsResponse`, …
+- **Reads:** `EscrowSummary`, `EscrowAsset`, `EscrowSnapshot`, `EscrowEvent`, `EscrowFinancial`, `ListEscrowsParams`, `ListEscrowsResponse`, …
 
 ## Environment
 
@@ -172,6 +174,16 @@ Breaking changes aligned with the Core v2 wire contract (2026-07-13):
 4. Deploy response includes **`contractId`**: `{ unsignedXdr, txHash, contractId }`.
 5. Deploy trustline is `{ contractId, symbol }` (Soroban SAC `C…` + asset code).
 6. Use `useDeployEscrow` + `Deploy*EscrowPayload` (no `Initialize*` aliases).
+
+### Read-model alignment (2026-07-15)
+
+Aligned with Core API changes:
+
+1. **`EscrowSummary`** includes root `balance` (string) and `asset { name, address, contractId }`.
+2. Read amounts (`balance`, `totalAmount`, financial fields, snapshot amounts) are **decimal strings**.
+3. **`createdByUserId` / `creatorAddress`** removed from reads (escrow state is public on-chain).
+4. Listing uses `scope=mine|all` for segmentation — not per-escrow access grants.
+5. After submit, handle `STELLAR_TX_SUBMITTED_INDEXER_LAGGING` and poll reads; `balance` is eventually consistent.
 
 ## License
 

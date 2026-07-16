@@ -6,6 +6,15 @@ import type {
 import type { EscrowSnapshot } from "./escrow.snapshot";
 
 /**
+ * Resolved trustline asset on read-model rows (Core API root `asset`).
+ */
+export type EscrowAsset = {
+  name: string | null;
+  address: string | null;
+  contractId: string | null;
+};
+
+/**
  * Escrow read-model row (list + detail). Identified only by `contractId`.
  */
 export type EscrowSummary = {
@@ -15,14 +24,15 @@ export type EscrowSummary = {
   engagementId: string;
   status: EscrowStatus;
   /** Multi-release only (sum of milestones). Null for single-release. */
-  totalAmount: number | null;
+  totalAmount: string | null;
+  /** Projected balance (deposited − released) in human token units. Always present. */
+  balance: string;
+  /** Resolved trustline token; null until first projection. */
+  asset: EscrowAsset | null;
   lastLedgerSeq: string;
   createdAt: string;
   updatedAt: string;
   snapshot: EscrowSnapshot;
-  /** Populated on detail / confirmed deploys (may be null for historical rows). */
-  createdByUserId?: string | null;
-  creatorAddress?: string | null;
 };
 
 /**
@@ -43,7 +53,7 @@ export type EscrowEvent = {
  */
 export type EscrowDeposit = {
   fromAddress: string;
-  amount: number | string;
+  amount: string;
   asset: string;
   txHash?: string;
   ledgerSeq?: string;
@@ -55,7 +65,7 @@ export type EscrowDeposit = {
  */
 export type EscrowNextRelease = {
   milestoneIndex: number;
-  amount: number | string;
+  amount: string;
 };
 
 /**
@@ -65,14 +75,15 @@ export type EscrowNextRelease = {
 export type EscrowFinancial = {
   contractId: string;
   type: EscrowType;
+  /** Legacy plain string (`USDC:G...`); prefer `EscrowSummary.asset` on list/detail. */
   asset: string;
-  platformFee: number | string;
-  totalAmount: number | string;
-  totalDeposited: number | string;
-  totalReleased: number | string;
-  pendingRelease: number | string;
+  platformFee: string;
+  totalAmount: string;
+  totalDeposited: string;
+  totalReleased: string;
+  pendingRelease: string;
   nextRelease: EscrowNextRelease | null;
-  balance: number | string;
+  balance: string;
 };
 
 /**
