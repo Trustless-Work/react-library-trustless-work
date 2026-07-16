@@ -1,212 +1,143 @@
+import type { EscrowType } from "./types";
+
 /**
- * Milestone
+ * Milestone approvals (v2 on-chain shape).
+ */
+export type MilestoneApprovals = {
+  target: number;
+  approvalCount: number;
+  approvedBy: string[];
+};
+
+/**
+ * Base milestone fields shared by single- and multi-release v2.
  */
 type BaseMilestone = {
-  /**
-   * Text describing the function of the milestone.
-   */
   description: string;
-
-  /**
-   * Milestone status. Ex: Approved, In dispute, etc...
-   */
   status?: string;
-
-  /**
-   * Evidence of work performed by the service provider.
-   */
   evidence?: string;
+  approvalsTarget?: number;
+  approvals?: MilestoneApprovals;
 };
 
 /**
- * Single Release Milestone
+ * Single-release milestone (v2).
  */
-export type SingleReleaseMilestone = BaseMilestone & {
-  /**
-   * Approved flag, only if the escrow is single-release
-   */
-  approved?: boolean;
+export type SingleReleaseMilestone = BaseMilestone;
+
+/**
+ * Per-milestone dispute state (multi-release v2).
+ */
+export type MilestoneDispute = {
+  isDisputed: boolean;
+  reason: string;
+  resolved: boolean;
 };
 
 /**
- * Multi Release Milestone
+ * Multi-release milestone (v2).
  */
 export type MultiReleaseMilestone = BaseMilestone & {
-  /**
-   * Amount to be transferred upon completion of this milestone
-   */
   amount: number;
-
-  /**
-   * Address where milestone proceeds will be sent to
-   */
   receiver: string;
-
-  /**
-   * Flags validating certain milestone life states, only if the escrow is multi-release
-   */
-  flags?: Flags;
+  dispute?: MilestoneDispute;
+  released?: boolean;
 };
 
 /**
- * Single Release Escrow
+ * Escrow-level dispute (single-release v2).
  */
-export type SingleReleaseEscrow = {
-  /**
-   * Address of the user signing the contract transaction
-   */
-  signer: string;
+export type Dispute = {
+  isDisputed: boolean;
+  reason: string;
+  resolved: boolean;
+};
 
-  /**
-   * ID (address) that identifies the escrow contract
-   */
+/**
+ * Trustline on deploy — Soroban SAC contract id + asset symbol.
+ */
+export type DeployTrustline = {
   contractId: string;
-
-  /**
-   * Unique identifier for the escrow
-   */
-  engagementId: string;
-
-  /**
-   * Name of the escrow
-   */
-  title: string;
-
-  /**
-   * Roles that make up the escrow structure
-   */
-  roles: Roles;
-
-  /**
-   * Text describing the function of the escrow
-   */
-  description: string;
-
-  /**
-   * Amount to be transferred upon completion of escrow milestones
-   */
-  amount: number;
-
-  /**
-   * Commission that the platform will receive when the escrow is completed
-   */
-  platformFee: number;
-
-  /**
-   * Amount of the token (XLM, USDC, EURC, etc) in the smart contract.
-   */
-  balance: number;
-
-  /**
-   * Objectives to be completed to define the escrow as completed
-   */
-  milestones: SingleReleaseMilestone[];
-
-  /**
-   * Flags validating certain escrow life states
-   */
-  flags?: Flags;
-
-  /**
-   * Information on the trustline that will manage the movement of funds in escrow
-   */
-  trustline: Trustline;
+  symbol: string;
 };
 
 /**
- * Multi Release Escrow
- */
-export type MultiReleaseEscrow = Omit<
-  SingleReleaseEscrow,
-  "milestones" | "flags" | "amount" | "roles"
-> & {
-  milestones: MultiReleaseMilestone[];
-  roles: Omit<Roles, "receiver">;
-};
-
-/**
- * Trustline
+ * Trustline on read / snapshot (may include issuer address and SAC contract id).
  */
 export type Trustline = {
-  /**
-   * Symbol of the token, example: USDC, EURC, etc...
-   */
-  symbol: string;
-
-  /**
-   * Public address establishing permission to accept and use a specific token.
-   */
   address: string;
+  symbol?: string;
+  contractId?: string;
 };
 
 /**
- * Roles
+ * Roles (v2) — single-release. Operational roles are arrays.
+ * `receiver` is escrow-level for single-release.
  */
 export type Roles = {
-  /**
-   * Address of the entity requiring the service.
-   */
-  approver: string;
-
-  /**
-   * Address of the entity providing the service.
-   */
-  serviceProvider: string;
-
-  /**
-   * Address of the entity that owns the escrow
-   */
-  platformAddress: string;
-
-  /**
-   * Address of the user in charge of releasing the escrow funds to the service provider.
-   */
-  releaseSigner: string;
-
-  /**
-   * Address in charge of resolving disputes within the escrow.
-   */
-  disputeResolver: string;
-
-  /**
-   * Address where escrow proceeds will be sent to
-   */
+  approvers: string[];
+  serviceProviders: string[];
+  platform: string;
+  releaseSigners: string[];
+  disputeResolvers: string[];
   receiver: string;
+  admin: string;
+  observers?: string[];
 };
 
 /**
- * Role
+ * Multi-release roles — no `receiver`; each milestone defines its own.
+ */
+export type MultiReleaseRoles = Omit<Roles, "receiver">;
+
+/**
+ * Role filter for list/query params.
  */
 export type Role =
   | "approver"
   | "serviceProvider"
-  | "platformAddress"
+  | "platform"
   | "releaseSigner"
   | "disputeResolver"
   | "receiver"
+  | "admin"
+  | "observer"
   | "signer";
 
 /**
- * Flags
+ * Shared on-chain / deploy-time escrow fields (not the HTTP read-model row).
  */
-export type Flags = {
-  /**
-   * Flag indicating that an escrow is in dispute.
-   */
-  disputed?: boolean;
-
-  /**
-   * Flag indicating that escrow funds have already been released.
-   */
-  released?: boolean;
-
-  /**
-   * Flag indicating that a disputed escrow has already been resolved.
-   */
-  resolved?: boolean;
-
-  /**
-   * Flag indicating whether a milestone has been approved by the approver.
-   */
-  approved?: boolean;
+type BaseEscrowFields = {
+  type: EscrowType;
+  contractId: string;
+  contractBaseId?: string;
+  signer: string;
+  engagementId: string;
+  title: string;
+  description: string;
+  platformFee: number;
+  balance: number;
+  transactionHash?: string | null;
+  trustline: Trustline;
 };
+
+/**
+ * Single-release escrow on-chain shape (snapshot / send-transaction).
+ */
+export type SingleReleaseEscrow = BaseEscrowFields & {
+  roles: Roles;
+  amount: number;
+  milestones: SingleReleaseMilestone[];
+  dispute?: Dispute;
+  released?: boolean;
+};
+
+/**
+ * Multi-release escrow on-chain shape (snapshot / send-transaction).
+ */
+export type MultiReleaseEscrow = BaseEscrowFields & {
+  roles: MultiReleaseRoles;
+  milestones: MultiReleaseMilestone[];
+};
+
+export type Escrow = SingleReleaseEscrow | MultiReleaseEscrow;

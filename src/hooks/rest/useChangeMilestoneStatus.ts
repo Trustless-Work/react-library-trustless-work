@@ -1,0 +1,17 @@
+import { useEscrowRest } from "../../provider";
+import { ChangeMilestoneStatusPayload, EscrowType } from "../../types";
+
+/**
+ * Batch change milestone status (v2). Works for single-release and multi-release.
+ * Payload: `{ contractId, serviceProvider, updates: [{ index, newStatus, newEvidence? }] }`.
+ */
+export function useChangeMilestoneStatus() {
+  const rest = useEscrowRest();
+
+  return {
+    changeMilestoneStatus: (
+      payload: ChangeMilestoneStatusPayload,
+      type: EscrowType
+    ) => rest.changeMilestoneStatus(payload, type),
+  };
+}

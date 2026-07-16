@@ -1,415 +1,237 @@
-import { EscrowType, SingleReleaseEscrowStatus } from "./types";
-import { MultiReleaseEscrow, Role, SingleReleaseEscrow } from "./types.entity";
+import type { EscrowStatus, EscrowType } from "./types";
+import type {
+  DeployTrustline,
+  MultiReleaseRoles,
+  Role,
+  Roles,
+  Trustline,
+} from "./types.entity";
+
+// ----------------- Shared -----------------
 
 /**
- * Documentation: https://docs.trustlesswork.com/trustless-work/developer-resources/quickstart/integration-demo-project/entities
+ * Address → amount distribution entry (v2 resolve / withdraw).
  */
-
-// ----------------- Milestone Payloads -----------------
-/**
- * Single Release Milestone Payload
- */
-export type SingleReleaseMilestonePayload = {
-  /**
-   * Text describing the function of the milestone
-   */
-  description: string;
+export type Distribution = {
+  address: string;
+  amount: number;
 };
 
 /**
- * Multi Release Milestone Payload
+ * Optional attribution headers for deploy (and other platform-scoped calls).
  */
-export type MultiReleaseMilestonePayload = {
-  /**
-   * Text describing the function of the milestone
-   */
+export type AttributionHeaders = {
+  /** Maps to `X-TW-Platform`. */
+  platformId?: string;
+  /** Maps to `X-TW-Subject`. */
+  subjectId?: string;
+};
+
+// ----------------- Milestone payloads (deploy / manage) -----------------
+
+export type SingleReleaseMilestonePayload = {
   description: string;
-  /**
-   * Amount to be transferred upon completion of this milestone
-   */
+  status?: string;
+  approvalsTarget: number;
+};
+
+export type MultiReleaseMilestonePayload = SingleReleaseMilestonePayload & {
   amount: number;
-  /**
-   * Address where milestone proceeds will be sent to
-   */
   receiver: string;
 };
 
-// ----------------- Initialize Escrow -----------------
-/**
- * Single Release Initialize Escrow Payload
- */
-export type InitializeSingleReleaseEscrowPayload = Omit<
-  SingleReleaseEscrow,
-  "contractId" | "balance" | "milestones"
-> & {
-  /**
-   * Objectives to be completed to define the escrow as completed
-   */
+// ----------------- Deploy Escrow -----------------
+
+export type DeploySingleReleaseEscrowPayload = {
+  signer: string;
+  engagementId: string;
+  title: string;
+  description: string;
+  amount: number;
+  platformFee: number;
+  roles: Roles;
   milestones: SingleReleaseMilestonePayload[];
+  trustline: DeployTrustline;
 };
 
-/**
- * Multi Release Initialize Escrow Payload
- */
-export type InitializeMultiReleaseEscrowPayload = Omit<
-  MultiReleaseEscrow,
-  "contractId" | "balance" | "milestones"
-> & {
-  /**
-   * Objectives to be completed to define the escrow as completed
-   */
+export type DeployMultiReleaseEscrowPayload = {
+  signer: string;
+  engagementId: string;
+  title: string;
+  description: string;
+  platformFee: number;
+  roles: MultiReleaseRoles;
   milestones: MultiReleaseMilestonePayload[];
+  trustline: DeployTrustline;
 };
 
 // ----------------- Update Escrow -----------------
-/**
- * Single Release Update Escrow Payload
- */
-export type UpdateSingleReleaseEscrowPayload = {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
-  contractId: string;
 
-  /**
-   * Escrow data
-   */
-  escrow: Omit<SingleReleaseEscrow, "contractId" | "signer" | "balance"> & {
-    /**
-     * Whether the escrow is active. This comes from DB, not from the blockchain.
-     */
-    isActive?: boolean;
-  };
-
-  /**
-   * Address of the user signing the contract transaction
-   */
-  signer: string;
+export type UpdateSingleReleaseEscrowProperties = {
+  engagementId: string;
+  title: string;
+  description: string;
+  amount: number;
+  platformFee: number;
+  roles: Roles;
+  milestones: SingleReleaseMilestonePayload[];
+  trustline: Trustline;
 };
 
-/**
- * Multi Release Update Escrow Payload
- */
-export type UpdateMultiReleaseEscrowPayload = {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
-  contractId: string;
-
-  /**
-   * Escrow data
-   */
-  escrow: Omit<MultiReleaseEscrow, "contractId" | "signer" | "balance"> & {
-    /**
-     * Whether the escrow is active. This comes from DB, not from the blockchain.
-     */
-    isActive?: boolean;
-  };
-
-  /**
-   * Address of the user signing the contract transaction
-   */
-  signer: string;
-};
-
-// ----------------- Change Milestone Status -----------------
-/**
- * Change Milestone Status Payload, this can be a single-release or multi-release
- */
-export type ChangeMilestoneStatusPayload = {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
-  contractId: string;
-
-  /**
-   * Index of the milestone to be updated
-   */
-  milestoneIndex: string;
-
-  /**
-   * New status of the milestone
-   */
-  newStatus: string;
-
-  /**
-   * New evidence of work performed by the service provider.
-   */
-  newEvidence?: string;
-
-  /**
-   * Address of the entity providing the service.
-   */
-  serviceProvider: string;
-};
-
-// ----------------- Approve Milestone -----------------
-/**
- * Approve Milestone Payload, this can be a single-release or multi-release
- */
-export type ApproveMilestonePayload = Omit<
-  ChangeMilestoneStatusPayload,
-  "serviceProvider" | "newStatus"
+export type UpdateMultiReleaseEscrowProperties = Omit<
+  UpdateSingleReleaseEscrowProperties,
+  "amount" | "milestones" | "roles"
 > & {
-  /**
-   * Address of the entity requiring the service.
-   */
+  roles: MultiReleaseRoles;
+  milestones: MultiReleaseMilestonePayload[];
+};
+
+export type UpdateSingleReleaseEscrowPayload = {
+  contractId: string;
+  admin: string;
+  escrow: UpdateSingleReleaseEscrowProperties;
+};
+
+export type UpdateMultiReleaseEscrowPayload = {
+  contractId: string;
+  admin: string;
+  escrow: UpdateMultiReleaseEscrowProperties;
+};
+
+// ----------------- Batch milestone operations (v2) -----------------
+
+export type MilestoneStatusUpdate = {
+  index: number;
+  newStatus: string;
+  newEvidence?: string;
+};
+
+export type ChangeMilestoneStatusPayload = {
+  contractId: string;
+  serviceProvider: string;
+  updates: MilestoneStatusUpdate[];
+};
+
+export type ApproveMilestonesPayload = {
+  contractId: string;
   approver: string;
+  milestoneIndexes: number[];
+};
+
+export type ApproveAndReleaseMilestonesPayload = {
+  contractId: string;
+  signer: string;
+  milestoneIndexes: number[];
+};
+
+export type SingleReleaseMilestoneDescriptionUpdate = {
+  index: number;
+  newDescription?: string;
+};
+
+export type MultiReleaseMilestoneDescriptionUpdate =
+  SingleReleaseMilestoneDescriptionUpdate & {
+    newAmount?: number;
+  };
+
+export type ManageSingleReleaseMilestonesPayload = {
+  contractId: string;
+  admin: string;
+  newMilestones: SingleReleaseMilestonePayload[];
+  milestoneUpdates: SingleReleaseMilestoneDescriptionUpdate[];
+};
+
+export type ManageMultiReleaseMilestonesPayload = {
+  contractId: string;
+  admin: string;
+  newMilestones: MultiReleaseMilestonePayload[];
+  milestoneUpdates: MultiReleaseMilestoneDescriptionUpdate[];
 };
 
 // ----------------- Start Dispute -----------------
-/**
- * Single Release Start Dispute Payload. This starts a dispute for the entire escrow.
- */
-export type SingleReleaseStartDisputePayload = {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
-  contractId: string;
 
-  /**
-   * Address of the user signing the contract transaction
-   */
+export type SingleReleaseStartDisputePayload = {
+  contractId: string;
   signer: string;
+  reason: string;
 };
 
-/**
- * Multi Release Start Dispute Payload. This starts a dispute for a specific milestone.
- */
 export type MultiReleaseStartDisputePayload =
   SingleReleaseStartDisputePayload & {
-    /**
-     * Index of the milestone to be disputed
-     */
-    milestoneIndex: string;
+    milestoneIndexes: number[];
   };
 
 // ----------------- Resolve Dispute -----------------
-/**
- * Resolve Dispute Payload
- */
+
 export type SingleReleaseResolveDisputePayload = {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
   contractId: string;
-
-  /**
-   * Address in charge of resolving disputes within the escrow.
-   */
   disputeResolver: string;
-
-  /**
-   * Distributions of the escrow amount to the receivers.
-   */
-  distributions: [
-    {
-      /**
-       * Address of the receiver
-       */
-      address: string;
-      /**
-       * Amount to be transferred to the receiver. All the amount must be equal to the total amount of the escrow.
-       */
-      amount: number;
-    },
-  ];
+  distributions: Distribution[];
 };
 
-/**
- * Multi Release Resolve Dispute Payload
- */
 export type MultiReleaseResolveDisputePayload =
   SingleReleaseResolveDisputePayload & {
-    /**
-     * Index of the milestone to be resolved
-     */
-    milestoneIndex: string;
+    milestoneIndexes: number[];
   };
 
 // ----------------- Withdraw Remaining Funds -----------------
-/**
- * Withdraw remaining funds
- */
-export type WithdrawRemainingFundsPayload = SingleReleaseResolveDisputePayload;
+
+export type SingleReleaseWithdrawRemainingFundsPayload =
+  SingleReleaseResolveDisputePayload;
+
+export type MultiReleaseWithdrawRemainingFundsPayload =
+  SingleReleaseWithdrawRemainingFundsPayload;
 
 // ----------------- Fund Escrow -----------------
-/**
- * Fund Escrow Payload, this can be a single-release or multi-release
- */
+
 export type FundEscrowPayload = {
-  /**
-   * Amount to be transferred upon completion of escrow milestones
-   */
   amount: number;
-
-  /**
-   * ID (address) that identifies the escrow contract
-   */
   contractId: string;
-
-  /**
-   * Address of the user signing the contract transaction
-   */
   signer: string;
 };
 
-// ----------------- Get Escrows From Indexer -----------------
-/**
- * Get Escrows From Indexer Params
- */
-export type GetEscrowsFromIndexerParams = {
-  /**
-   * Page number. Pagination
-   */
-  page?: number;
-
-  /**
-   * Sorting direction. Sorting
-   */
-  orderDirection?: "asc" | "desc";
-
-  /**
-   * Order by property. Sorting
-   */
-  orderBy?: "createdAt" | "updatedAt" | "amount";
-
-  /**
-   * Created at = start date. Filtering
-   */
-  startDate?: string;
-
-  /**
-   * Created at = end date. Filtering
-   */
-  endDate?: string;
-
-  /**
-   * Max amount. Filtering
-   */
-  maxAmount?: number;
-
-  /**
-   * Min amount. Filtering
-   */
-  minAmount?: number;
-
-  /**
-   * Is active. Filtering
-   */
-  isActive?: boolean;
-
-  /**
-   * Escrow that you are looking for. Filtering
-   */
-  title?: string;
-
-  /**
-   * Engagement ID. Filtering
-   */
-  engagementId?: string;
-
-  /**
-   * Status of the single-release escrow. Filtering
-   */
-  status?: SingleReleaseEscrowStatus;
-
-  /**
-   * Type of the escrow. Filtering
-   */
-  type?: EscrowType;
-
-  /**
-   * If true, the escrows will be validated on the blockchain to ensure data consistency.
-   * This performs an additional verification step to confirm that the escrow data
-   * returned from the indexer matches the current state on the blockchain.
-   * Use this when you need to ensure the most up-to-date and accurate escrow information.
-   * If you active this param, your request will take longer to complete.
-   */
-  validateOnChain?: boolean;
-};
-
-export type GetEscrowsFromIndexerBySignerParams =
-  GetEscrowsFromIndexerParams & {
-    /**
-     * Address of the user signing the contract transaction.
-     */
-    signer: string;
-  };
-
-export type GetEscrowsFromIndexerByRoleParams = GetEscrowsFromIndexerParams & {
-  /**
-   * Role of the user. Required
-   */
-  role: Role;
-
-  /**
-   * Address of the owner of the escrows. If you want to get all escrows from a specific role, you can use this parameter. But with this parameter, you can't use the signer parameter.
-   */
-  roleAddress: string;
-};
-
-export type GetEscrowFromIndexerByContractIdsParams = {
-  /**
-   * IDs (addresses) that identifies the escrow contracts.
-   */
-  contractIds: string[];
-
-  /**
-   * If true, the escrows will be validated on the blockchain to ensure data consistency.
-   * This performs an additional verification step to confirm that the escrow data
-   * returned from the indexer matches the current state on the blockchain.
-   * Use this when you need to ensure the most up-to-date and accurate escrow information.
-   * If you active this param, your request will take longer to complete.
-   */
-  validateOnChain?: boolean;
-};
-
 // ----------------- Release Funds -----------------
-/**
- * Single Release Release Funds Payload
- */
-export type SingleReleaseReleaseFundsPayload = {
-  /**
-   * ID (address) that identifies the escrow contract
-   */
-  contractId: string;
 
-  /**
-   * Address of the user in charge of releasing the escrow funds to the service provider.
-   */
+export type SingleReleaseReleaseFundsPayload = {
+  contractId: string;
   releaseSigner: string;
 };
 
-/**
- * Multi Release Release Funds Payload
- */
 export type MultiReleaseReleaseFundsPayload =
   SingleReleaseReleaseFundsPayload & {
-    /**
-     * Index of the milestone to be released
-     */
-    milestoneIndex: string;
+    milestoneIndexes: number[];
   };
 
-// ----------------- Get Balance -----------------
+// ----------------- Reads: list / batch params -----------------
+
 /**
- * Get Balance Params
+ * Query params for `GET /escrows`.
+ * Note: the filter is still named `contractType`; response field is `type`.
  */
-export type GetBalanceParams = {
-  /**
-   * Addresses of the escrows to get the balance
-   */
-  addresses: string[];
+export type ListEscrowsParams = {
+  scope?: "mine" | "all";
+  status?: EscrowStatus;
+  contractType?: EscrowType;
+  engagementId?: string;
+  contractIds?: string[];
+  participant?: string;
+  role?: Role;
+  platformId?: string;
+  subjectId?: string;
+  createdAfter?: string;
+  createdBefore?: string;
+  limit?: number;
+  cursor?: string;
+  sort?: "createdAt" | "updatedAt";
+  order?: "asc" | "desc";
 };
 
-// ----------------- Update From Transaction Hash -----------------
-/**
- * Payload for updating escrow data from a transaction hash.
- */
-export type UpdateFromTxHashPayload = {
-  /**
-   * Transaction hash to be used for the update.
-   */
-  txHash: string;
+export type BatchContractIdsParams = {
+  contractIds: string[];
+};
+
+export type ListEscrowEventsParams = {
+  limit?: number;
+  order?: "asc" | "desc";
+  cursor?: string;
 };

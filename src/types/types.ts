@@ -1,39 +1,19 @@
 /**
- * The base URL for the Trustless Work API
+ * Base URL for the Trustless Work Core API.
  */
-export type baseURL =
-  | "https://api.trustlesswork.com"
-  | "https://dev.api.trustlesswork.com";
+export type baseURL = string;
 
 /**
- * Escrow Type
+ * Escrow contract family.
  */
 export type EscrowType = "single-release" | "multi-release";
 
 /**
- * Escrow Status
+ * Derived on-chain escrow status (read-model).
  */
-export type SingleReleaseEscrowStatus =
-  | "working"
-  | "pendingRelease"
-  | "released"
-  | "resolved"
-  | "inDispute";
+export type EscrowStatus = "active" | "released" | "disputed";
 
 /**
- * Http Method
+ * Network identifier returned by the Core API.
  */
-export type HttpMethod = "get" | "post" | "put" | "delete";
-
-/**
- * Unique possible statuses for a Trustless Work request
- */
-export type Status = "SUCCESS" | "FAILED";
-
-/**
- * Date
- */
-export type Date = {
-  _seconds: number;
-  _nanoseconds: number;
-};
+export type EscrowNetwork = string;
