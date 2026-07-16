@@ -1,6 +1,6 @@
 {
   "name": "@trustless-work/escrow",
-  "version": "5.0.0",
+  "version": "5.0.0-beta.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -67,7 +67,8 @@
   "type": "commonjs",
   "description": "This SDK is a React/TypeScript client for Trustless Work.",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "beta"
   },
   "peerDependencies": {
     "react": ">=18.0.0 <20.0.0",
