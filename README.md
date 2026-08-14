@@ -17,11 +17,7 @@ Identity is always **`contractId`** (Soroban `C…`). Types: `single-release` | 
 ## Installation
 
 ```bash
-npm install @trustless-work/escrow@5
-# or
-yarn add @trustless-work/escrow@5
-# or
-pnpm add @trustless-work/escrow@5
+npm i @trustless-work/escrow@beta
 ```
 
 Peer dependencies: `react` and `react-dom` `>=18 <20`.
