@@ -4,11 +4,11 @@
 
 **`@trustless-work/escrow` v5** — React/TypeScript client for Trustless Work **Core API v2** escrows.
 
-| Surface | What it does |
-|---------|----------------|
-| **REST operate** | Build unsigned XDR → you sign → `sendTransaction` |
-| **REST reads** | `GET /escrows*` (list, detail, events, milestones, financial) |
-| **GraphQL reads** | `POST /graphql` (`escrow` / `escrows`) |
+| Surface           | What it does                                                  |
+| ----------------- | ------------------------------------------------------------- |
+| **REST operate**  | Build unsigned XDR → you sign → `sendTransaction`             |
+| **REST reads**    | `GET /escrows*` (list, detail, events, milestones, financial) |
+| **GraphQL reads** | `POST /graphql` (`escrow` / `escrows`)                        |
 
 Identity is always **`contractId`** (Soroban `C…`). Types: `single-release` | `multi-release`.
 
@@ -33,10 +33,7 @@ If you publish/install under an npm dist-tag (e.g. `beta`), use that tag instead
 ```tsx
 "use client";
 
-import {
-  development,
-  TrustlessWorkConfig,
-} from "@trustless-work/escrow";
+import { development, TrustlessWorkConfig } from "@trustless-work/escrow";
 
 export function TrustlessWorkProvider({
   children,
@@ -66,12 +63,12 @@ Optional wallet-session auth and default platform header:
 </TrustlessWorkConfig>
 ```
 
-| Prop | Role |
-|------|------|
-| `baseURL` | Core API host (`development` / `mainNet` helpers, or any URL string) |
-| `apiKey` | `x-api-key` header |
-| `getAccessToken` | Optional Bearer token getter (re-read per request) |
-| `defaultHeaders` | Merged into every request (e.g. `X-TW-Platform`) |
+| Prop             | Role                                                                 |
+| ---------------- | -------------------------------------------------------------------- |
+| `baseURL`        | Core API host (`development` / `mainNet` helpers, or any URL string) |
+| `apiKey`         | `x-api-key` header                                                   |
+| `getAccessToken` | Optional Bearer token getter (re-read per request)                   |
+| `defaultHeaders` | Merged into every request (e.g. `X-TW-Platform`)                     |
 
 ### Without React
 
@@ -89,21 +86,21 @@ await client.graphql.getEscrow({ contractId });
 
 ## Package entry points
 
-| Import | Contains |
-|--------|----------|
-| `@trustless-work/escrow` | Config, client, REST + GraphQL hooks, types, errors |
-| `@trustless-work/escrow/rest` | `EscrowRestService` + REST hooks only |
-| `@trustless-work/escrow/graphql` | GraphQL service, documents, GraphQL hooks |
-| `@trustless-work/escrow/hooks` | All hooks (REST + GraphQL) |
-| `@trustless-work/escrow/hooks/rest` | REST hooks only |
-| `@trustless-work/escrow/hooks/graphql` | GraphQL hooks only |
-| `@trustless-work/escrow/types` | Payloads, responses, read-model, entities |
+| Import                                 | Contains                                            |
+| -------------------------------------- | --------------------------------------------------- |
+| `@trustless-work/escrow`               | Config, client, REST + GraphQL hooks, types, errors |
+| `@trustless-work/escrow/rest`          | `EscrowRestService` + REST hooks only               |
+| `@trustless-work/escrow/graphql`       | GraphQL service, documents, GraphQL hooks           |
+| `@trustless-work/escrow/hooks`         | All hooks (REST + GraphQL)                          |
+| `@trustless-work/escrow/hooks/rest`    | REST hooks only                                     |
+| `@trustless-work/escrow/hooks/graphql` | GraphQL hooks only                                  |
+| `@trustless-work/escrow/types`         | Payloads, responses, read-model, entities           |
 
 ```tsx
 import { useEscrowRest, useEscrowGraphql } from "@trustless-work/escrow";
 import { useGraphqlGetEscrow } from "@trustless-work/escrow/hooks/graphql";
 
-const rest = useEscrowRest();       // operate + GET /escrows*
+const rest = useEscrowRest(); // operate + GET /escrows*
 const graphql = useEscrowGraphql(); // POST /graphql
 const { getEscrow } = useGraphqlGetEscrow();
 ```
@@ -155,11 +152,11 @@ Deploy trustline shape: `{ contractId, symbol }` (Soroban SAC `C…` + asset cod
 
 Operate responses:
 
-| Step | Type | Shape |
-|------|------|-------|
-| Deploy build | `DeployEscrowResponse` | `{ unsignedXdr, txHash, contractId }` |
-| Other builds | `BuildTransactionResponse` | `{ unsignedXdr, txHash }` |
-| Submit | `SendTransactionResponse` | `{ txHash, ledger, contractId?, escrow?, code?, message? }` |
+| Step         | Type                       | Shape                                                       |
+| ------------ | -------------------------- | ----------------------------------------------------------- |
+| Deploy build | `DeployEscrowResponse`     | `{ unsignedXdr, txHash, contractId }`                       |
+| Other builds | `BuildTransactionResponse` | `{ unsignedXdr, txHash }`                                   |
+| Submit       | `SendTransactionResponse`  | `{ txHash, ledger, contractId?, escrow?, code?, message? }` |
 
 `code` may be `STELLAR_TX_SUBMITTED` or `STELLAR_TX_SUBMITTED_INDEXER_LAGGING`.
 
@@ -167,37 +164,40 @@ Operate responses:
 
 Import from `@trustless-work/escrow`, `@trustless-work/escrow/hooks`, or `@trustless-work/escrow/hooks/rest`.
 
-| Hook | Action |
-|------|--------|
-| `useDeployEscrow` | Create escrow (`unsignedXdr` + predicted `contractId`) |
-| `useFundEscrow` | Fund |
-| `useUpdateEscrow` | Update properties |
-| `useChangeMilestoneStatus` | Status / evidence (batch) |
-| `useApproveMilestones` | Approve (batch) |
-| `useApproveAndReleaseMilestones` | Approve + release (multi-release) |
-| `useManageMilestones` | Add / edit milestones |
-| `useReleaseFunds` | Release |
-| `useStartDispute` | Start dispute |
-| `useResolveDispute` | Resolve dispute (distributions) |
-| `useWithdrawRemainingFunds` | Withdraw remaining |
-| `useSendTransaction` | Submit signed XDR (`POST /stellar/send-transaction`) |
+| Hook                             | Action                                                 |
+| -------------------------------- | ------------------------------------------------------ |
+| `useDeployEscrow`                | Create escrow (`unsignedXdr` + predicted `contractId`) |
+| `useFundEscrow`                  | Fund                                                   |
+| `useUpdateEscrow`                | Update properties                                      |
+| `useChangeMilestoneStatus`       | Status / evidence (batch)                              |
+| `useApproveMilestones`           | Approve (batch)                                        |
+| `useApproveAndReleaseMilestones` | Approve + release (multi-release)                      |
+| `useManageMilestones`            | Add / edit milestones                                  |
+| `useReleaseFunds`                | Release                                                |
+| `useStartDispute`                | Start dispute                                          |
+| `useResolveDispute`              | Resolve dispute (distributions)                        |
+| `useWithdrawRemainingFunds`      | Withdraw remaining                                     |
+| `useSendTransaction`             | Submit signed XDR (`POST /stellar/send-transaction`)   |
 
 Most operate methods take `(payload, type)` where `type` is `"single-release"` | `"multi-release"`. Multi-only helpers (`approveAndReleaseMilestones`, etc.) omit the type argument.
 
 ## Reads — REST
 
-| Hook | Endpoint |
-|------|----------|
-| `useListEscrows` | `GET /escrows` |
-| `useGetEscrow` | `GET /escrows/:contractId` |
-| `useGetEscrowDetails` | `GET /escrows/details?contractIds=` |
-| `useListEscrowEvents` | `GET /escrows/:contractId/events` |
-| `useGetEscrowMilestones` | `GET /escrows/:contractId/milestones` |
+| Hook                      | Endpoint                               |
+| ------------------------- | -------------------------------------- |
+| `useListEscrows`          | `GET /escrows`                         |
+| `useGetEscrow`            | `GET /escrows/:contractId`             |
+| `useGetEscrowDetails`     | `GET /escrows/details?contractIds=`    |
+| `useListEscrowEvents`     | `GET /escrows/:contractId/events`      |
+| `useGetEscrowMilestones`  | `GET /escrows/:contractId/milestones`  |
 | `useGetEscrowsMilestones` | `GET /escrows/milestones?contractIds=` |
-| `useGetEscrowsFinancial` | `GET /escrows/financial?contractIds=` |
+| `useGetEscrowsFinancial`  | `GET /escrows/financial?contractIds=`  |
 
 ```tsx
-import { useListEscrows, useGetEscrow } from "@trustless-work/escrow/hooks/rest";
+import {
+  useListEscrows,
+  useGetEscrow,
+} from "@trustless-work/escrow/hooks/rest";
 import { useQuery } from "@tanstack/react-query";
 
 const { listEscrows } = useListEscrows();
@@ -224,27 +224,30 @@ useQuery({
 
 ### Read-model shapes
 
-| Type | Notes |
-|------|--------|
-| `EscrowSummary` | List/detail row: `contractId`, `type`, `status`, `balance`, `asset`, camelCased `snapshot` |
-| `EscrowDetail` | `{ escrow, events, deposits }` |
-| `EscrowFinancial` | Batch financial: deposited / released / pending / `balance` |
-| `EscrowEvent` | Indexed event (`kind`, `topics`, `payload`, …) — no UUID event `id` |
-| `EscrowDeposit` | Deposit row — no UUID deposit `id` |
+| Type              | Notes                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| `EscrowSummary`   | List/detail row: `contractId`, `type`, `status`, `balance`, `asset`, camelCased `snapshot` |
+| `EscrowDetail`    | `{ escrow, events, deposits }`                                                             |
+| `EscrowFinancial` | Batch financial: deposited / released / pending / `balance`                                |
+| `EscrowEvent`     | Indexed event (`kind`, `topics`, `payload`, …) — no UUID event `id`                        |
+| `EscrowDeposit`   | Deposit row — no UUID deposit `id`                                                         |
 
 There is **no** UUID `id` / `escrowId`. Amounts on reads are **human decimal strings** (e.g. `"250.5"`) — do **not** divide by `1e7`. Build/operate payloads still use human **numbers**.
 
 ## Reads — GraphQL
 
-| Hook | Query |
-|------|-------|
-| `useGraphqlGetEscrow` | `escrow(contractId)` + financial / deposits / events |
-| `useGraphqlListEscrows` | `escrows(...)` (same filters as REST list) |
+| Hook                    | Query                                                |
+| ----------------------- | ---------------------------------------------------- |
+| `useGraphqlGetEscrow`   | `escrow(contractId)` + financial / deposits / events |
+| `useGraphqlListEscrows` | `escrows(...)` (same filters as REST list)           |
 
 Documents: `GRAPHQL_GET_ESCROW`, `GRAPHQL_LIST_ESCROWS`.
 
 ```tsx
-import { useGraphqlGetEscrow, useGraphqlListEscrows } from "@trustless-work/escrow/hooks/graphql";
+import {
+  useGraphqlGetEscrow,
+  useGraphqlListEscrows,
+} from "@trustless-work/escrow/hooks/graphql";
 
 const { getEscrow } = useGraphqlGetEscrow();
 const { listEscrows } = useGraphqlListEscrows();
@@ -281,7 +284,9 @@ try {
   if (err instanceof TrustlessWorkApiError) {
     // err.code, err.status, err.detail, err.traceId, err.extensions
     toast.error(formatApiErrorMessage(err));
-    if (err.code === ESCROW_ERROR_CODES.ESCROW_NOT_FOUND) { /* … */ }
+    if (err.code === ESCROW_ERROR_CODES.ESCROW_NOT_FOUND) {
+      /* … */
+    }
   }
 }
 ```
@@ -292,19 +297,19 @@ Also exported: `parseProblemDetails`, `parseProblemDetailsFromAxiosError`, `isPr
 
 Import from `@trustless-work/escrow/types` (or the root package):
 
-| Area | Examples |
-|------|----------|
+| Area                 | Examples                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ |
 | **Operate payloads** | `DeploySingleReleaseEscrowPayload`, `FundEscrowPayload`, `ApproveMilestonesPayload`, `AttributionHeaders`, … |
-| **Responses** | `DeployEscrowResponse`, `BuildTransactionResponse`, `SendTransactionResponse`, `ListEscrowsResponse`, … |
-| **Reads** | `EscrowSummary`, `EscrowAsset`, `EscrowSnapshot`, `EscrowEvent`, `EscrowFinancial`, `KeysetPage`, … |
-| **Entities** | `Escrow`, `Roles`, `DeployTrustline`, `SingleReleaseMilestone`, … |
-| **Errors** | `ApiProblemDetails`, `EscrowErrorCode`, `ESCROW_ERROR_CODES` |
+| **Responses**        | `DeployEscrowResponse`, `BuildTransactionResponse`, `SendTransactionResponse`, `ListEscrowsResponse`, …      |
+| **Reads**            | `EscrowSummary`, `EscrowAsset`, `EscrowSnapshot`, `EscrowEvent`, `EscrowFinancial`, `KeysetPage`, …          |
+| **Entities**         | `Escrow`, `Roles`, `DeployTrustline`, `SingleReleaseMilestone`, …                                            |
+| **Errors**           | `ApiProblemDetails`, `EscrowErrorCode`, `ESCROW_ERROR_CODES`                                                 |
 
 ## Environment
 
 `development` and `mainNet` currently point at:
 
-`https://trustless-core-production.up.railway.app`
+`https://beta.api.trustlesswork.com`
 
 Pass any Core API `baseURL` string when you need another host. Get an API key from the Trustless Work dApp.
 
