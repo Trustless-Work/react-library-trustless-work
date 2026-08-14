@@ -14,19 +14,19 @@ Breaking changes aligned with the Core v2 wire contract.
 
 Deleted endpoints and hooks:
 
-* `/helper/get-escrows-by-*`
-* `/helper/get-escrow-by-contract-ids`
-* `/helper/get-multiple-escrow-balance`
-* Hooks: `useGetEscrowsFromIndexerBySigner`, `useGetEscrowsFromIndexerByRole`, `useGetEscrowFromIndexerByContractIds`, `useGetMultipleEscrowBalances`
-{% endstep %}
+- `/helper/get-escrows-by-*`
+- `/helper/get-escrow-by-contract-ids`
+- `/helper/get-multiple-escrow-balance`
+- Hooks: `useGetEscrowsFromIndexerBySigner`, `useGetEscrowsFromIndexerByRole`, `useGetEscrowFromIndexerByContractIds`, `useGetMultipleEscrowBalances`
+  {% endstep %}
 
 {% step %}
 **Use REST or GraphQL reads**
 
-* [`useListEscrows`](/escrow-react-sdk/indexer/uselistescrows) / [`useGetEscrow`](/escrow-react-sdk/indexer/usegetescrow) / [`useGetEscrowDetails`](/escrow-react-sdk/indexer/usegetescrowdetails)
-* Financial & milestones hooks under [REST Reads](/escrow-react-sdk/indexer)
-* Or [GraphQL](/escrow-react-sdk/graphql) equivalents
-{% endstep %}
+- [`useListEscrows`](/escrow-react-sdk/indexer/uselistescrows) / [`useGetEscrow`](/escrow-react-sdk/indexer/usegetescrow) / [`useGetEscrowDetails`](/escrow-react-sdk/indexer/usegetescrowdetails)
+- Financial & milestones hooks under [REST Reads](/escrow-react-sdk/indexer)
+- Or [GraphQL](/escrow-react-sdk/graphql) equivalents
+  {% endstep %}
 
 {% step %}
 **Adopt `contractId` identity**
@@ -37,9 +37,9 @@ Escrow identity is **`contractId` only** (no UUID). Deploy response includes pre
 {% step %}
 **Rename deploy APIs**
 
-* Use `useDeployEscrow` + `Deploy*EscrowPayload` (no `Initialize*` / `useInitializeEscrow` aliases)
-* Deploy trustline is `{ contractId, symbol }` (Soroban SAC + asset code)
-{% endstep %}
+- Use `useDeployEscrow` + `Deploy*EscrowPayload` (no `Initialize*` / `useInitializeEscrow` aliases)
+- Deploy trustline is `{ contractId, symbol }` (Soroban SAC + asset code)
+  {% endstep %}
 
 {% step %}
 **Batch milestone ops**
@@ -67,7 +67,7 @@ Use `useApproveMilestones`, `useChangeMilestoneStatus`, `useManageMilestones`, `
 `development` and `mainNet` currently both point at:
 
 ```
-https://trustless-core-production.up.railway.app
+https://beta.api.trustlesswork.com
 ```
 
 See [Getting Started](/escrow-react-sdk/getting-started) and [Architecture](/escrow-react-sdk/architecture).

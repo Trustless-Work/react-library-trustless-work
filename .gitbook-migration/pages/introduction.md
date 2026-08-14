@@ -6,11 +6,11 @@ description: React/TypeScript client for Trustless Work Core API v2 escrows.
 
 **`@trustless-work/escrow` v5** — React/TypeScript client for Trustless Work **Core API v2** escrows.
 
-| Surface | What it does |
-| --- | --- |
-| **REST operate** | Build unsigned XDR → you sign → [`useSendTransaction`](/escrow-react-sdk/usesendtransaction) |
-| **REST reads** | `GET /escrows*` (list, detail, events, milestones, financial) |
-| **GraphQL reads** | `POST /graphql` (`escrow` / `escrows`) |
+| Surface           | What it does                                                                                 |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| **REST operate**  | Build unsigned XDR → you sign → [`useSendTransaction`](/escrow-react-sdk/usesendtransaction) |
+| **REST reads**    | `GET /escrows*` (list, detail, events, milestones, financial)                                |
+| **GraphQL reads** | `POST /graphql` (`escrow` / `escrows`)                                                       |
 
 Identity is always **`contractId`** (Soroban `C…`). Escrow types: `single-release` | `multi-release`.
 
@@ -24,10 +24,10 @@ Auth, users, platforms, wallets, admin, and access grants are **out of scope** f
 
 ### What you'll do with the SDK
 
-* Deploy escrows with [`useDeployEscrow`](/escrow-react-sdk/escrows/usedeployescrow) — single-release or multi-release.
-* Fund, update, manage milestones, approve, release, dispute, resolve, and withdraw.
-* Read escrows via [REST](/escrow-react-sdk/indexer) or [GraphQL](/escrow-react-sdk/graphql).
-* Submit signed XDR with [`useSendTransaction`](/escrow-react-sdk/usesendtransaction).
+- Deploy escrows with [`useDeployEscrow`](/escrow-react-sdk/escrows/usedeployescrow) — single-release or multi-release.
+- Fund, update, manage milestones, approve, release, dispute, resolve, and withdraw.
+- Read escrows via [REST](/escrow-react-sdk/indexer) or [GraphQL](/escrow-react-sdk/graphql).
+- Submit signed XDR with [`useSendTransaction`](/escrow-react-sdk/usesendtransaction).
 
 {% hint style="warning" %}
 Read amounts are **human decimal strings** (e.g. `"250.5"`). Do **not** divide by `1e7`. Operate payloads still use human **numbers**.
@@ -38,7 +38,7 @@ Read amounts are **human decimal strings** (e.g. `"250.5"`). Do **not** divide b
 `development` and `mainNet` currently both point at:
 
 ```
-https://trustless-core-production.up.railway.app
+https://beta.api.trustlesswork.com
 ```
 
 Pass any Core API `baseURL` string when you need another host. Get an API key from the Trustless Work dApp.

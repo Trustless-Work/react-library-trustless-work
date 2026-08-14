@@ -1,58 +1,70 @@
 ---
-description: Payload, response, read-model, and entity types for @trustless-work/escrow v5.
+description: Plain shapes for the most important `@trustless-work/escrow` types — entities, payloads, responses, and the read model.
 ---
 
 # Types
 
-Import from `@trustless-work/escrow/types` (or the root package).
+All types below ship with `@trustless-work/escrow`. Import them from the package root or from `@trustless-work/escrow/types`.
 
-### Operate payloads
+```ts
+import type {
+  DeploySingleReleaseEscrowPayload,
+  EscrowSummary,
+  Roles,
+} from "@trustless-work/escrow";
+```
 
-| Area | Examples |
-| --- | --- |
-| Deploy | `DeploySingleReleaseEscrowPayload`, `DeployMultiReleaseEscrowPayload`, `DeployTrustline`, `AttributionHeaders` |
-| Update | `UpdateSingleReleaseEscrowPayload`, `UpdateMultiReleaseEscrowPayload` |
-| Fund / release | `FundEscrowPayload`, `SingleReleaseReleaseFundsPayload`, `MultiReleaseReleaseFundsPayload` |
-| Milestones | `ChangeMilestoneStatusPayload`, `ApproveMilestonesPayload`, `ApproveAndReleaseMilestonesPayload`, `ManageSingleReleaseMilestonesPayload`, `ManageMultiReleaseMilestonesPayload` |
-| Dispute | `SingleReleaseStartDisputePayload`, `MultiReleaseStartDisputePayload`, `SingleReleaseResolveDisputePayload`, `MultiReleaseResolveDisputePayload`, `Distribution` |
-| Withdraw | `SingleReleaseWithdrawRemainingFundsPayload`, `MultiReleaseWithdrawRemainingFundsPayload` |
+{% hint style="info" %}
+**Three buckets**
 
-### Responses
-
-| Type | Shape |
-| --- | --- |
-| `DeployEscrowResponse` | `{ unsignedXdr, txHash, contractId }` |
-| `BuildTransactionResponse` | `{ unsignedXdr, txHash }` |
-| `SendTransactionResponse` | `{ txHash, ledger, contractId?, escrow?, code?, message? }` |
-| `ListEscrowsResponse` | `KeysetPage<EscrowSummary>` |
-| `GetEscrowResponse` | `EscrowDetail` |
-| Batch responses | `BatchEscrowDetailsResponse`, `BatchEscrowMilestonesResponse`, `BatchEscrowFinancialResponse` |
-| `ListEscrowEventsResponse` | `KeysetPage<EscrowEvent>` |
-
-### Reads
-
-| Type | Notes |
-| --- | --- |
-| `EscrowSummary` | Root `balance` (string), `asset { name, address, contractId }`, camelCased `snapshot` |
-| `EscrowDetail` | `{ escrow, events, deposits }` |
-| `EscrowFinancial` | Deposited / released / pending / `balance` |
-| `EscrowEvent` / `EscrowDeposit` | No UUID `id` |
-| `KeysetPage<T>` | `{ data, hasMore, nextCursor }` |
-| `ListEscrowsParams` | Filters for list |
-| `BatchContractIdsParams` | `{ contractIds: string[] }` |
-
-### Entities
-
-`Escrow`, `SingleReleaseEscrow`, `MultiReleaseEscrow`, `Roles`, `MultiReleaseRoles`, `SingleReleaseMilestone`, `MultiReleaseMilestone`, `Trustline`, `DeployTrustline`, `Dispute`, …
-
-### Primitives
-
-`EscrowType` = `"single-release" | "multi-release"` · `EscrowStatus` = `"active" | "released" | "disputed"` · `baseURL` = `string`
-
-### Errors
-
-`ApiProblemDetails`, `EscrowErrorCode`, `ESCROW_ERROR_CODES` — see [Errors](/escrow-react-sdk/errors).
+1. **Entities** — on-chain shapes (roles, milestones, escrow).
+2. **Payloads** — what you send to operate hooks / REST (deploy, fund, release, …).
+3. **Reads & responses** — what Core returns after build, submit, or GET.
+{% endhint %}
 
 {% hint style="warning" %}
-Read amounts are **decimal strings**. Operate payloads use human **numbers**. There is no UUID `id` / `escrowId` — use `contractId`.
+**Amounts**
+
+- **Operate payloads** use human **numbers** (`amount: 1000`).
+- **Read-model** fields use **decimal strings** (`balance: "1000"`, `amount: "250"`).
+
+There is no UUID `id` / `escrowId`. Always identify an escrow with `contractId` (`C…`).
 {% endhint %}
+
+## Browse by topic
+
+| Page | What you’ll find |
+| --- | --- |
+| [Entities](/escrow-react-sdk/types/entities) | `Roles`, milestones, `SingleReleaseEscrow` / `MultiReleaseEscrow`, trustline |
+| [Payloads](/escrow-react-sdk/types/payloads) | Deploy, update, fund, release, dispute, manage milestones |
+| [Reads & responses](/escrow-react-sdk/types/reads-and-responses) | `EscrowSummary`, snapshots, list params, build/send responses |
+| [Errors](/escrow-react-sdk/errors) | `ApiProblemDetails` and escrow error codes |
+
+## Core values
+
+```ts
+type EscrowType = "single-release" | "multi-release";
+
+type EscrowStatus = "active" | "released" | "disputed";
+
+type EscrowNetwork = string; // network id from Core
+
+type baseURL = string; // Core API base URL
+```
+
+| Value | Meaning |
+| --- | --- |
+| `single-release` | One payout for the whole escrow after milestones are done |
+| `multi-release` | Each milestone can be released on its own |
+| `active` / `released` / `disputed` | Derived status on list/detail rows |
+
+## Quick map
+
+| You want to… | Start with |
+| --- | --- |
+| Deploy an escrow | `DeploySingleReleaseEscrowPayload` / `DeployMultiReleaseEscrowPayload` → [Payloads](/escrow-react-sdk/types/payloads) |
+| Fund / release / dispute | Matching `*Payload` → [Payloads](/escrow-react-sdk/types/payloads) |
+| Show a list in the UI | `EscrowSummary` → [Reads & responses](/escrow-react-sdk/types/reads-and-responses) |
+| Show one escrow | `EscrowDetail` → [Reads & responses](/escrow-react-sdk/types/reads-and-responses) |
+| Sign & submit | `BuildTransactionResponse` → wallet → `SendTransactionResponse` |
+| Handle failures | [Errors](/escrow-react-sdk/errors) |
